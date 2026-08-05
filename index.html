@@ -219,6 +219,7 @@
       <li><a class="jump" href="#prologue"><span class="n">00</span> Someone types a sentence</a></li>
       <li><a class="jump" href="#shape"><span class="n">01</span> The shape</a></li>
       <li><a class="jump" href="#spec"><span class="n">02</span> The keystone</a></li>
+      <li><a class="jump" href="#engine"><span class="n">&#9670;</span> Metadata, not code</a></li>
       <li><a class="jump" href="#pipeline"><span class="n">03</span> Sentence &rarr; app</a></li>
       <li><a class="jump" href="#rag"><span class="n">04</span> Grounded in your world</a></li>
       <li><a class="jump" href="#serving"><span class="n">05</span> Serving it, safely</a></li>
@@ -371,6 +372,30 @@
       <div class="notes">
         <div class="note"><span class="k">spec</span><p><b>Sections:</b> data model · views (from a <em>closed</em> vocabulary) · roles · policies · workflows · integrations · optional code escape-hatch. No per-app styling knobs — coherence by construction.</p></div>
         <div class="note"><span class="k solid">payoff</span><p><b>Diffs are meaningful.</b> Two versions diff to a semantic changeset that renders to plain English — which makes the approval gate (06) and safe live edits (07) possible.</p></div>
+      </div>
+    </section>
+
+    <!-- interlude: metadata vs code -->
+    <section class="step reveal" id="engine">
+      <div class="step-head"><span class="step-num">&#9670;</span><span class="step-label">Under the keystone · the engine</span></div>
+      <h2>Metadata, not code — and how the maths actually works.</h2>
+      <p class="thesis">The deepest fork: does the model emit <em>structured data</em> a fixed runtime
+      interprets, or <em>source code</em> that runs? Ziroo chooses metadata for ~95% of apps — because
+      coherence, non-engineer approval, plain-English edits, near-zero runtime cost, and safety
+      <em>all</em> break the moment the default output is code. Code is a quarantined last resort.</p>
+
+      <div class="plate"><div class="plate-cap"><span class="tick"></span>The escalation ladder · climb only when the rung above can&rsquo;t express it</div><div class="dia"><svg id="za9" width="276" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="flowchart" style="max-width:none; background-color: transparent;" viewBox="0 0 276 727.25" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#za9{font-size:12.5px;fill:#0A0A0A;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#za9 .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#za9 .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#za9 .error-icon{fill:hsl(180, 0%, 99.1176470588%);}#za9 .error-text{fill:rgb(2.2500000001, 2.2500000001, 2.2500000001);stroke:rgb(2.2500000001, 2.2500000001, 2.2500000001);}#za9 .edge-thickness-normal{stroke-width:1px;}#za9 .edge-thickness-thick{stroke-width:3.5px;}#za9 .edge-pattern-solid{stroke-dasharray:0;}#za9 .edge-thickness-invisible{stroke-width:0;fill:none;}#za9 .edge-pattern-dashed{stroke-dasharray:3;}#za9 .edge-pattern-dotted{stroke-dasharray:2;}#za9 .marker{fill:#555555;stroke:#555555;}#za9 .marker.cross{stroke:#555555;}#za9 svg{font-size:12.5px;}#za9 p{margin:0;}#za9 .label{color:#0A0A0A;}#za9 .cluster-label text{fill:rgb(2.2500000001, 2.2500000001, 2.2500000001);}#za9 .cluster-label span{color:rgb(2.2500000001, 2.2500000001, 2.2500000001);}#za9 .cluster-label span p{background-color:transparent;}#za9 .label text,#za9 span{fill:#0A0A0A;color:#0A0A0A;}#za9 .node rect,#za9 .node circle,#za9 .node ellipse,#za9 .node polygon,#za9 .node path{fill:#F0F0F0;stroke:#888888;stroke-width:1px;}#za9 .rough-node .label text,#za9 .node .label text,#za9 .image-shape .label,#za9 .icon-shape .label{text-anchor:middle;}#za9 .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#za9 .rough-node .label,#za9 .node .label,#za9 .image-shape .label,#za9 .icon-shape .label{text-align:center;}#za9 .node.clickable{cursor:pointer;}#za9 .root .anchor path{fill:#555555!important;stroke-width:0;stroke:#555555;}#za9 .arrowheadPath{fill:#0b0b0b;}#za9 .edgePath .path{stroke:#555555;stroke-width:1px;}#za9 .flowchart-link{stroke:#555555;fill:none;}#za9 .edgeLabel{background-color:hsl(-120, 0%, 94.1176470588%);text-align:center;}#za9 .edgeLabel p{background-color:hsl(-120, 0%, 94.1176470588%);}#za9 .edgeLabel rect{opacity:0.5;background-color:hsl(-120, 0%, 94.1176470588%);fill:hsl(-120, 0%, 94.1176470588%);}#za9 .labelBkg{background-color:rgba(239.9999999999, 239.9999999999, 239.9999999999, 0.5);}#za9 .cluster rect{fill:hsl(180, 0%, 99.1176470588%);stroke:hsl(180, 0%, 89.1176470588%);stroke-width:1px;}#za9 .cluster text{fill:rgb(2.2500000001, 2.2500000001, 2.2500000001);}#za9 .cluster span{color:rgb(2.2500000001, 2.2500000001, 2.2500000001);}#za9 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-size:12px;background:hsl(180, 0%, 99.1176470588%);border:1px solid hsl(180, 0%, 89.1176470588%);border-radius:2px;pointer-events:none;z-index:100;}#za9 .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#0A0A0A;}#za9 rect.text{fill:none;stroke-width:0;}#za9 .icon-shape,#za9 .image-shape{background-color:hsl(-120, 0%, 94.1176470588%);text-align:center;}#za9 .icon-shape p,#za9 .image-shape p{background-color:hsl(-120, 0%, 94.1176470588%);padding:2px;}#za9 .icon-shape .label rect,#za9 .image-shape .label rect{opacity:0.5;background-color:hsl(-120, 0%, 94.1176470588%);fill:hsl(-120, 0%, 94.1176470588%);}#za9 .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#za9 .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#za9 .node .neo-node{stroke:#888888;}#za9 [data-look="neo"].node rect,#za9 [data-look="neo"].cluster rect,#za9 [data-look="neo"].node polygon{stroke:url(#za9-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#za9 [data-look="neo"].swimlane.cluster rect{filter:none;}#za9 [data-look="neo"].node path{stroke:url(#za9-gradient);stroke-width:1px;}#za9 [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#za9 [data-look="neo"].node .neo-line path{stroke:#888888;filter:none;}#za9 [data-look="neo"].node circle{stroke:url(#za9-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#za9 [data-look="neo"].node circle .state-start{fill:#000000;}#za9 [data-look="neo"].icon-shape .icon{fill:url(#za9-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#za9 [data-look="neo"].icon-shape .icon-neo path{stroke:url(#za9-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#za9 :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}#za9 .ann&gt;*{fill:rgb(255, 255, 255)!important;stroke:rgb(255, 255, 255)!important;color:rgb(106, 106, 106)!important;}#za9 .ann span{fill:rgb(255, 255, 255)!important;stroke:rgb(255, 255, 255)!important;color:rgb(106, 106, 106)!important;}#za9 .ann tspan{fill:rgb(106, 106, 106)!important;}#za9 .def&gt;*{fill:rgb(22, 22, 22)!important;stroke:rgb(0, 0, 0)!important;color:rgb(255, 255, 255)!important;}#za9 .def span{fill:rgb(22, 22, 22)!important;stroke:rgb(0, 0, 0)!important;color:rgb(255, 255, 255)!important;}#za9 .def tspan{fill:rgb(255, 255, 255)!important;}#za9 .form&gt;*{fill:rgb(255, 255, 255)!important;stroke:rgb(10, 10, 10)!important;color:rgb(10, 10, 10)!important;stroke-width:2px!important;}#za9 .form span{fill:rgb(255, 255, 255)!important;stroke:rgb(10, 10, 10)!important;color:rgb(10, 10, 10)!important;stroke-width:2px!important;}#za9 .form tspan{fill:rgb(10, 10, 10)!important;}#za9 .code&gt;*{fill:rgb(255, 255, 255)!important;stroke:rgb(10, 10, 10)!important;color:rgb(10, 10, 10)!important;stroke-width:2px!important;stroke-dasharray:5,3!important;}#za9 .code span{fill:rgb(255, 255, 255)!important;stroke:rgb(10, 10, 10)!important;color:rgb(10, 10, 10)!important;stroke-width:2px!important;stroke-dasharray:5,3!important;}#za9 .code tspan{fill:rgb(10, 10, 10)!important;}</style><g><marker id="za9_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="za9_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="za9_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="za9_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="za9_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="za9_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="za9_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="za9_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="za9_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"/></marker><marker id="za9_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"/></marker><marker id="za9_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;"/></marker><marker id="za9_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;"/></marker><g class="root"><g class="clusters"/><g class="edgePaths"><path d="M138,56.75L138,60.917C138,65.083,138,73.417,138,81.083C138,88.75,138,95.75,138,99.25L138,102.75" id="za9-L_Top_R1_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_Top_R1_0" data-points="W3sieCI6MTM4LCJ5Ijo1Ni43NX0seyJ4IjoxMzgsInkiOjgxLjc1fSx7IngiOjEzOCwieSI6MTA2Ljc1fV0=" data-look="classic" marker-end="url(#za9_flowchart-v2-pointEnd)"/><path d="M138,174.25L138,179.979C138,185.708,138,197.167,138,207.958C138,218.75,138,228.875,138,233.938L138,239" id="za9-L_R1_R2_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_R1_R2_0" data-points="W3sieCI6MTM4LCJ5IjoxNzQuMjV9LHsieCI6MTM4LCJ5IjoyMDguNjI1fSx7IngiOjEzOCwieSI6MjQzfV0=" data-look="classic" marker-end="url(#za9_flowchart-v2-pointEnd)"/><path d="M138,310.5L138,316.229C138,321.958,138,333.417,138,344.208C138,355,138,365.125,138,370.188L138,375.25" id="za9-L_R2_R3_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_R2_R3_0" data-points="W3sieCI6MTM4LCJ5IjozMTAuNX0seyJ4IjoxMzgsInkiOjM0NC44NzV9LHsieCI6MTM4LCJ5IjozNzkuMjV9XQ==" data-look="classic" marker-end="url(#za9_flowchart-v2-pointEnd)"/><path d="M138,446.75L138,452.479C138,458.208,138,469.667,138,480.458C138,491.25,138,501.375,138,506.438L138,511.5" id="za9-L_R3_R4_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_R3_R4_0" data-points="W3sieCI6MTM4LCJ5Ijo0NDYuNzV9LHsieCI6MTM4LCJ5Ijo0ODEuMTI1fSx7IngiOjEzOCwieSI6NTE1LjV9XQ==" data-look="classic" marker-end="url(#za9_flowchart-v2-pointEnd)"/><path d="M138,601.75L138,605.917C138,610.083,138,618.417,138,626.083C138,633.75,138,640.75,138,644.25L138,647.75" id="za9-L_R4_Bot_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_R4_Bot_0" data-points="W3sieCI6MTM4LCJ5Ijo2MDEuNzV9LHsieCI6MTM4LCJ5Ijo2MjYuNzV9LHsieCI6MTM4LCJ5Ijo2NTEuNzV9XQ==" data-look="classic" marker-end="url(#za9_flowchart-v2-pointEnd)"/></g><g class="edgeLabels"><g class="edgeLabel"><g class="label" data-id="L_Top_R1_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(138, 208.625)"><g class="label" data-id="L_R1_R2_0" transform="translate(-38.3671875, -9.375)"><foreignObject width="76.734375" height="18.75"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>can't express?</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(138, 344.875)"><g class="label" data-id="L_R2_R3_0" transform="translate(-38.3671875, -9.375)"><foreignObject width="76.734375" height="18.75"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>can't express?</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(138, 481.125)"><g class="label" data-id="L_R3_R4_0" transform="translate(-38.3671875, -9.375)"><foreignObject width="76.734375" height="18.75"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>can't express?</p></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_R4_Bot_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g></g><g class="nodes"><g class="node default ann" id="za9-flowchart-Top-0" data-look="classic" transform="translate(138, 32.375)"><rect class="basic label-container" style="fill:#FFFFFF !important;stroke:#FFFFFF !important" x="-129.0546875" y="-24.375" width="258.109375" height="48.75"/><g class="label" style="color:#6A6A6A !important" transform="translate(-99.0546875, -9.375)"><rect/><foreignObject width="198.109375" height="18.75"><div style="color: rgb(106, 106, 106) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:#6A6A6A !important" class="nodeLabel"><p>cheaper · safer · coherent · instant</p></span></div></foreignObject></g></g><g class="node default def" id="za9-flowchart-R1-1" data-look="classic" transform="translate(138, 140.5)"><rect class="basic label-container" style="fill:#161616 !important;stroke:#000000 !important" x="-114.421875" y="-33.75" width="228.84375" height="67.5"/><g class="label" style="color:#FFFFFF !important" transform="translate(-84.421875, -18.75)"><rect/><foreignObject width="168.84375" height="37.5"><div style="color: rgb(255, 255, 255) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:#FFFFFF !important" class="nodeLabel"><p>1 · Configure a default widget<br />table · form · queue · chart</p></span></div></foreignObject></g></g><g class="node default def" id="za9-flowchart-R2-2" data-look="classic" transform="translate(138, 276.75)"><rect class="basic label-container" style="fill:#161616 !important;stroke:#000000 !important" x="-90.3671875" y="-33.75" width="180.734375" height="67.5"/><g class="label" style="color:#FFFFFF !important" transform="translate(-60.3671875, -18.75)"><rect/><foreignObject width="120.734375" height="37.5"><div style="color: rgb(255, 255, 255) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:#FFFFFF !important" class="nodeLabel"><p>2 · Compose defaults<br />dashboards from tiles</p></span></div></foreignObject></g></g><g class="node default form" id="za9-flowchart-R3-3" data-look="classic" transform="translate(138, 413)"><rect class="basic label-container" style="fill:#FFFFFF !important;stroke:#0A0A0A !important;stroke-width:2px !important" x="-117.578125" y="-33.75" width="235.15625" height="67.5"/><g class="label" style="color:#0A0A0A !important" transform="translate(-87.578125, -18.75)"><rect/><foreignObject width="175.15625" height="37.5"><div style="color: rgb(10, 10, 10) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:#0A0A0A !important" class="nodeLabel"><p>3 · Formula / expression<br />safe · declarative · explainable</p></span></div></foreignObject></g></g><g class="node default code" id="za9-flowchart-R4-4" data-look="classic" transform="translate(138, 558.625)"><rect class="basic label-container" style="fill:#FFFFFF !important;stroke:#0A0A0A !important;stroke-width:2px !important;stroke-dasharray:5 3 !important" x="-130" y="-43.125" width="260" height="86.25"/><g class="label" style="color:#0A0A0A !important" transform="translate(-100, -28.125)"><rect/><foreignObject width="200" height="56.25"><div style="color: rgb(10, 10, 10) !important; display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:#0A0A0A !important" class="nodeLabel"><p>4 · Sandboxed code<br />generate-once · typed · tested · pinned</p></span></div></foreignObject></g></g><g class="node default ann" id="za9-flowchart-Bot-5" data-look="classic" transform="translate(138, 685.5)"><rect class="basic label-container" style="fill:#FFFFFF !important;stroke:#FFFFFF !important" x="-130" y="-33.75" width="260" height="67.5"/><g class="label" style="color:#6A6A6A !important" transform="translate(-100, -18.75)"><rect/><foreignObject width="200" height="37.5"><div style="color: rgb(106, 106, 106) !important; display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:#6A6A6A !important" class="nodeLabel"><p>more flexible · costlier · sandboxed</p></span></div></foreignObject></g></g></g></g></g><defs><filter id="za9-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"/></filter></defs><defs><filter id="za9-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"/></filter></defs><linearGradient id="za9-gradient" gradientUnits="objectBoundingBox" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#888888" stop-opacity="1"/><stop offset="100%" stop-color="hsl(-120, 0%, 84.1176470588%)" stop-opacity="1"/></linearGradient></svg></div></div>
+      <div class="notes">
+        <div class="note"><span class="k solid">default</span><p><b>Rungs 1–2 are default widgets</b> (a curated, tested, themed catalog the model <em>configures</em>, never invents). &ldquo;Dynamic&rdquo; needs are met by configuration + composition; a genuinely new pattern is added to the catalog <em>once</em> and becomes a default for every app — never per-app bespoke UI.</p></div>
+        <div class="note"><span class="k">formula</span><p><b>Rung 3 is a formula, not code</b> — a safe, declarative expression (<code>allowance − sum(approved).days</code>). Cheap to generate, deterministic, and explainable in plain English for approval.</p></div>
+        <div class="note"><span class="k soft">code</span><p><b>Rung 4 is sandboxed code — generated once, typed, unit-tested, contract-checked, pinned</b> (not re-emitted per run). Confined to logic, never UI. Its cost is amortized; recurring uses graduate down into defaults.</p></div>
+      </div>
+
+      <div class="plate" style="margin-top:24px"><div class="plate-cap"><span class="tick"></span>Formulas · the engine picks static vs dynamic per formula</div><div class="dia"><svg id="za10" width="926" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="flowchart" style="max-width:none; background-color: transparent;" viewBox="0 0 925.8125 374.75" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#za10{font-size:12.5px;fill:#0A0A0A;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#za10 .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#za10 .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#za10 .error-icon{fill:hsl(180, 0%, 99.1176470588%);}#za10 .error-text{fill:rgb(2.2500000001, 2.2500000001, 2.2500000001);stroke:rgb(2.2500000001, 2.2500000001, 2.2500000001);}#za10 .edge-thickness-normal{stroke-width:1px;}#za10 .edge-thickness-thick{stroke-width:3.5px;}#za10 .edge-pattern-solid{stroke-dasharray:0;}#za10 .edge-thickness-invisible{stroke-width:0;fill:none;}#za10 .edge-pattern-dashed{stroke-dasharray:3;}#za10 .edge-pattern-dotted{stroke-dasharray:2;}#za10 .marker{fill:#555555;stroke:#555555;}#za10 .marker.cross{stroke:#555555;}#za10 svg{font-size:12.5px;}#za10 p{margin:0;}#za10 .label{color:#0A0A0A;}#za10 .cluster-label text{fill:rgb(2.2500000001, 2.2500000001, 2.2500000001);}#za10 .cluster-label span{color:rgb(2.2500000001, 2.2500000001, 2.2500000001);}#za10 .cluster-label span p{background-color:transparent;}#za10 .label text,#za10 span{fill:#0A0A0A;color:#0A0A0A;}#za10 .node rect,#za10 .node circle,#za10 .node ellipse,#za10 .node polygon,#za10 .node path{fill:#F0F0F0;stroke:#888888;stroke-width:1px;}#za10 .rough-node .label text,#za10 .node .label text,#za10 .image-shape .label,#za10 .icon-shape .label{text-anchor:middle;}#za10 .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#za10 .rough-node .label,#za10 .node .label,#za10 .image-shape .label,#za10 .icon-shape .label{text-align:center;}#za10 .node.clickable{cursor:pointer;}#za10 .root .anchor path{fill:#555555!important;stroke-width:0;stroke:#555555;}#za10 .arrowheadPath{fill:#0b0b0b;}#za10 .edgePath .path{stroke:#555555;stroke-width:1px;}#za10 .flowchart-link{stroke:#555555;fill:none;}#za10 .edgeLabel{background-color:hsl(-120, 0%, 94.1176470588%);text-align:center;}#za10 .edgeLabel p{background-color:hsl(-120, 0%, 94.1176470588%);}#za10 .edgeLabel rect{opacity:0.5;background-color:hsl(-120, 0%, 94.1176470588%);fill:hsl(-120, 0%, 94.1176470588%);}#za10 .labelBkg{background-color:rgba(239.9999999999, 239.9999999999, 239.9999999999, 0.5);}#za10 .cluster rect{fill:hsl(180, 0%, 99.1176470588%);stroke:hsl(180, 0%, 89.1176470588%);stroke-width:1px;}#za10 .cluster text{fill:rgb(2.2500000001, 2.2500000001, 2.2500000001);}#za10 .cluster span{color:rgb(2.2500000001, 2.2500000001, 2.2500000001);}#za10 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-size:12px;background:hsl(180, 0%, 99.1176470588%);border:1px solid hsl(180, 0%, 89.1176470588%);border-radius:2px;pointer-events:none;z-index:100;}#za10 .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#0A0A0A;}#za10 rect.text{fill:none;stroke-width:0;}#za10 .icon-shape,#za10 .image-shape{background-color:hsl(-120, 0%, 94.1176470588%);text-align:center;}#za10 .icon-shape p,#za10 .image-shape p{background-color:hsl(-120, 0%, 94.1176470588%);padding:2px;}#za10 .icon-shape .label rect,#za10 .image-shape .label rect{opacity:0.5;background-color:hsl(-120, 0%, 94.1176470588%);fill:hsl(-120, 0%, 94.1176470588%);}#za10 .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#za10 .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#za10 .node .neo-node{stroke:#888888;}#za10 [data-look="neo"].node rect,#za10 [data-look="neo"].cluster rect,#za10 [data-look="neo"].node polygon{stroke:url(#za10-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#za10 [data-look="neo"].swimlane.cluster rect{filter:none;}#za10 [data-look="neo"].node path{stroke:url(#za10-gradient);stroke-width:1px;}#za10 [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#za10 [data-look="neo"].node .neo-line path{stroke:#888888;filter:none;}#za10 [data-look="neo"].node circle{stroke:url(#za10-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#za10 [data-look="neo"].node circle .state-start{fill:#000000;}#za10 [data-look="neo"].icon-shape .icon{fill:url(#za10-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#za10 [data-look="neo"].icon-shape .icon-neo path{stroke:url(#za10-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#za10 :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}#za10 .usr&gt;*{fill:rgb(255, 255, 255)!important;stroke:rgb(153, 153, 153)!important;color:rgb(10, 10, 10)!important;}#za10 .usr span{fill:rgb(255, 255, 255)!important;stroke:rgb(153, 153, 153)!important;color:rgb(10, 10, 10)!important;}#za10 .usr tspan{fill:rgb(10, 10, 10)!important;}#za10 .dec&gt;*{fill:rgb(230, 230, 230)!important;stroke:rgb(85, 85, 85)!important;color:rgb(10, 10, 10)!important;}#za10 .dec span{fill:rgb(230, 230, 230)!important;stroke:rgb(85, 85, 85)!important;color:rgb(10, 10, 10)!important;}#za10 .dec tspan{fill:rgb(10, 10, 10)!important;}#za10 .bld&gt;*{fill:rgb(255, 255, 255)!important;stroke:rgb(10, 10, 10)!important;color:rgb(10, 10, 10)!important;stroke-width:2px!important;}#za10 .bld span{fill:rgb(255, 255, 255)!important;stroke:rgb(10, 10, 10)!important;color:rgb(10, 10, 10)!important;stroke-width:2px!important;}#za10 .bld tspan{fill:rgb(10, 10, 10)!important;}#za10 .run&gt;*{fill:rgb(22, 22, 22)!important;stroke:rgb(0, 0, 0)!important;color:rgb(255, 255, 255)!important;}#za10 .run span{fill:rgb(22, 22, 22)!important;stroke:rgb(0, 0, 0)!important;color:rgb(255, 255, 255)!important;}#za10 .run tspan{fill:rgb(255, 255, 255)!important;}</style><g><marker id="za10_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="za10_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="za10_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="za10_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="za10_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="za10_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="za10_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="za10_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="za10_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"/></marker><marker id="za10_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"/></marker><marker id="za10_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;"/></marker><marker id="za10_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;"/></marker><g class="root"><g class="clusters"/><g class="edgePaths"><path d="M192.078,187.375L196.245,187.375C200.411,187.375,208.745,187.375,216.411,187.375C224.078,187.375,231.078,187.375,234.578,187.375L238.078,187.375" id="za10-L_Change_Eng_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_Change_Eng_0" data-points="W3sieCI6MTkyLjA3ODEyNSwieSI6MTg3LjM3NX0seyJ4IjoyMTcuMDc4MTI1LCJ5IjoxODcuMzc1fSx7IngiOjI0Mi4wNzgxMjUsInkiOjE4Ny4zNzV9XQ==" data-look="classic" marker-end="url(#za10_flowchart-v2-pointEnd)"/><path d="M361.294,141.185L373.159,126.175C385.024,111.165,408.754,81.145,427.704,66.135C446.654,51.125,460.823,51.125,467.908,51.125L474.992,51.125" id="za10-L_Eng_Der_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_Eng_Der_0" data-points="W3sieCI6MzYxLjI5Mzk0MDc0NjQ5MzMsInkiOjE0MS4xODQ1NjU3NDY0OTMzMn0seyJ4Ijo0MzIuNDg0Mzc1LCJ5Ijo1MS4xMjV9LHsieCI6NDc4Ljk5MjE4NzUsInkiOjUxLjEyNX1d" data-look="classic" marker-end="url(#za10_flowchart-v2-pointEnd)"/><path d="M407.484,187.375L411.651,187.375C415.818,187.375,424.151,187.375,431.818,187.375C439.484,187.375,446.484,187.375,449.984,187.375L453.484,187.375" id="za10-L_Eng_Mat_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_Eng_Mat_0" data-points="W3sieCI6NDA3LjQ4NDM3NSwieSI6MTg3LjM3NX0seyJ4Ijo0MzIuNDg0Mzc1LCJ5IjoxODcuMzc1fSx7IngiOjQ1Ny40ODQzNzUsInkiOjE4Ny4zNzV9XQ==" data-look="classic" marker-end="url(#za10_flowchart-v2-pointEnd)"/><path d="M361.294,233.565L373.159,248.575C385.024,263.585,408.754,293.605,424.384,308.615C440.013,323.625,447.542,323.625,451.306,323.625L455.07,323.625" id="za10-L_Eng_Snap_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_Eng_Snap_0" data-points="W3sieCI6MzYxLjI5Mzk0MDc0NjQ5MzMsInkiOjIzMy41NjU0MzQyNTM1MDY2OH0seyJ4Ijo0MzIuNDg0Mzc1LCJ5IjozMjMuNjI1fSx7IngiOjQ1OS4wNzAzMTI1LCJ5IjozMjMuNjI1fV0=" data-look="classic" marker-end="url(#za10_flowchart-v2-pointEnd)"/><path d="M666.109,187.375L682.19,187.375C698.271,187.375,730.432,187.375,761.927,187.375C793.422,187.375,824.25,187.375,839.664,187.375L855.078,187.375" id="za10-L_Mat_Bal_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_Mat_Bal_0" data-points="W3sieCI6NjY2LjEwOTM3NSwieSI6MTg3LjM3NX0seyJ4Ijo3NjIuNTkzNzUsInkiOjE4Ny4zNzV9LHsieCI6ODU5LjA3ODEyNSwieSI6MTg3LjM3NX1d" data-look="classic" marker-end="url(#za10_flowchart-v2-pointEnd)"/></g><g class="edgeLabels"><g class="edgeLabel"><g class="label" data-id="L_Change_Eng_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_Eng_Der_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_Eng_Mat_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_Eng_Snap_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(762.59375, 187.375)"><g class="label" data-id="L_Mat_Bal_0" transform="translate(-71.484375, -9.375)"><foreignObject width="142.96875" height="18.75"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>on approve → decrement</p></span></div></foreignObject></g></g></g><g class="nodes"><g class="node default usr" id="za10-flowchart-Change-0" data-look="classic" transform="translate(100.0390625, 187.375)"><rect class="basic label-container" style="fill:#FFFFFF !important;stroke:#999999 !important" x="-92.0390625" y="-33.75" width="184.078125" height="67.5"/><g class="label" style="color:#0A0A0A !important" transform="translate(-62.0390625, -18.75)"><rect/><foreignObject width="124.078125" height="37.5"><div style="color: rgb(10, 10, 10) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:#0A0A0A !important" class="nodeLabel"><p>Data changes<br />e.g. request approved</p></span></div></foreignObject></g></g><g class="node default dec" id="za10-flowchart-Eng-1" data-look="classic" transform="translate(324.78125, 187.375)"><polygon points="82.703125,0 165.40625,-82.703125 82.703125,-165.40625 0,-82.703125" class="label-container" transform="translate(-82.203125, 82.703125)" style="fill:#E6E6E6 !important;stroke:#555555 !important"/><g class="label" style="color:#0A0A0A !important" transform="translate(-48.953125, -18.75)"><rect/><foreignObject width="97.90625" height="37.5"><div style="color: rgb(10, 10, 10) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:#0A0A0A !important" class="nodeLabel"><p>Formula engine<br />picks per formula</p></span></div></foreignObject></g></g><g class="node default bld" id="za10-flowchart-Der-2" data-look="classic" transform="translate(561.796875, 51.125)"><rect class="basic label-container" style="fill:#FFFFFF !important;stroke:#0A0A0A !important;stroke-width:2px !important" x="-82.8046875" y="-43.125" width="165.609375" height="86.25"/><g class="label" style="color:#0A0A0A !important" transform="translate(-52.8046875, -28.125)"><rect/><foreignObject width="105.609375" height="56.25"><div style="color: rgb(10, 10, 10) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:#0A0A0A !important" class="nodeLabel"><p>DERIVED · dynamic<br />compute on read<br />days = to − from</p></span></div></foreignObject></g></g><g class="node default bld" id="za10-flowchart-Mat-3" data-look="classic" transform="translate(561.796875, 187.375)"><rect class="basic label-container" style="fill:#FFFFFF !important;stroke:#0A0A0A !important;stroke-width:2px !important" x="-104.3125" y="-43.125" width="208.625" height="86.25"/><g class="label" style="color:#0A0A0A !important" transform="translate(-74.3125, -28.125)"><rect/><foreignObject width="148.625" height="56.25"><div style="color: rgb(10, 10, 10) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:#0A0A0A !important" class="nodeLabel"><p>MATERIALIZED · static<br />stored + event-maintained<br />leave balance</p></span></div></foreignObject></g></g><g class="node default bld" id="za10-flowchart-Snap-4" data-look="classic" transform="translate(561.796875, 323.625)"><rect class="basic label-container" style="fill:#FFFFFF !important;stroke:#0A0A0A !important;stroke-width:2px !important" x="-102.7265625" y="-43.125" width="205.453125" height="86.25"/><g class="label" style="color:#0A0A0A !important" transform="translate(-72.7265625, -28.125)"><rect/><foreignObject width="145.453125" height="56.25"><div style="color: rgb(10, 10, 10) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:#0A0A0A !important" class="nodeLabel"><p>SNAPSHOT · static<br />frozen at the event<br />balance after this request</p></span></div></foreignObject></g></g><g class="node default run" id="za10-flowchart-Bal-5" data-look="classic" transform="translate(888.4453125, 187.375)"><path d="M0,7.991750999234629 a29.3671875,7.991750999234629 0,0,0 58.734375,0 a29.3671875,7.991750999234629 0,0,0 -58.734375,0 l0,41.741750999234625 a29.3671875,7.991750999234629 0,0,0 58.734375,0 l0,-41.741750999234625" class="basic label-container outer-path" style="fill:#161616 !important;stroke:#000000 !important" transform="translate(-29.3671875, -28.86262649885194)"/><g class="label" style="color:#FFFFFF !important" transform="translate(-21.8671875, 0.625)"><rect/><foreignObject width="43.734375" height="18.75"><div style="color: rgb(255, 255, 255) !important; display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span style="color:#FFFFFF !important" class="nodeLabel"><p>Balance</p></span></div></foreignObject></g></g></g></g></g><defs><filter id="za10-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"/></filter></defs><defs><filter id="za10-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"/></filter></defs><linearGradient id="za10-gradient" gradientUnits="objectBoundingBox" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#888888" stop-opacity="1"/><stop offset="100%" stop-color="hsl(-120, 0%, 84.1176470588%)" stop-opacity="1"/></linearGradient></svg></div></div>
+      <div class="notes">
+        <div class="note"><span class="k">derived</span><p><b>Dynamic — computed on read</b> for cheap, row-local values (<code>days</code>, totals). Nothing stored; always fresh.</p></div>
+        <div class="note"><span class="k solid">materialized</span><p><b>Static — stored and incrementally maintained.</b> The leave balance decrements automatically because the generator wrote an event-trigger (<em>on approve → decrement</em>) from the formula&rsquo;s dependency graph. A DAG recomputes only what changed, inside the transaction — no staleness, no storms.</p></div>
+        <div class="note"><span class="k soft">scale</span><p><b>Metadata growth doesn&rsquo;t inflate prompts.</b> Context is <em>retrieved and sliced</em>, edits emit <em>patches</em> not rewrites, stable layers are prompt-cached — so prompt size scales with the <em>change</em>, not the account. And the runtime is <b>LLM-free</b>, so serving cost is independent of spec size.</p></div>
       </div>
     </section>
 
@@ -625,7 +650,14 @@ incrementally · Hybrid app runtime (managed runtime + code escape hatch) · AWS
 <li><a href="#1-first-principles--the-four-hard-problems">First principles &amp; the four hard problems</a></li>
 <li><a href="#2-foundational-decisions-adr-summary">Foundational decisions (ADR summary)</a></li>
 <li><a href="#3-the-10000-ft-view-three-planes">The 10,000-ft view: three planes</a></li>
-<li><a href="#4-the-app-spec--the-keystone-abstraction">The App Spec — the keystone abstraction</a></li>
+<li><a href="#4-the-app-spec--the-keystone-abstraction">The App Spec — the keystone abstraction</a><ul>
+<li><a href="#41-metadata-driven-vs-code-generation--the-fork-under-the-keystone">4.1 Metadata-driven vs code-generation</a></li>
+<li><a href="#42-default-widgets-vs-dynamic-widgets">4.2 Default widgets vs dynamic widgets</a></li>
+<li><a href="#43-when-metadata-grows--keeping-token-cost-and-latency-flat">4.3 When metadata grows — token cost &amp; latency</a></li>
+<li><a href="#44-when-code-is-unavoidable--reliability-consistency-and-cost">4.4 When code is unavoidable — reliability, consistency, cost</a></li>
+<li><a href="#45-formulas--static-dynamic-and-how-the-balance-actually-decrements">4.5 Formulas — static, dynamic, and the auto-decrement</a></li>
+</ul>
+</li>
 <li><a href="#5-multi-tenancy--isolation">Multi-tenancy &amp; isolation</a></li>
 <li><a href="#6-the-generation-pipeline-prompt--app">The generation pipeline (prompt → app)</a></li>
 <li><a href="#7-prompt-handling">Prompt handling</a></li>
@@ -766,6 +798,18 @@ Zite, Rocket) are weak or silent. They are load-bearing requirements, not featur
 <td><strong>Centralized policy engine (Cedar / AWS Verified Permissions)</strong></td>
 <td>Role isolation is a platform guarantee; policies are declared in the spec and evaluated centrally, never hand-written per app.</td>
 </tr>
+<tr>
+<td>D9</td>
+<td>UI vocabulary</td>
+<td><strong>Default widgets, curated catalog that grows</strong></td>
+<td>Coherence + accessibility + cost require a closed, tested widget set the model <em>configures</em>; recurring &quot;dynamic&quot; needs graduate into defaults, never per-app bespoke UI (§4.2).</td>
+</tr>
+<tr>
+<td>D10</td>
+<td>Computation model</td>
+<td><strong>Safe formula expressions; escalate to code only when needed</strong></td>
+<td>Most calculations are declarative formulas (cheap, safe, explainable); the runtime picks derived vs materialized vs snapshot; code is the last rung of the escalation ladder (§4.4–4.5).</td>
+</tr>
 </tbody></table></div>
 <p>Rejected at this level:</p>
 <ul>
@@ -849,6 +893,179 @@ generator emits a code function that runs in the sandbox (§10) and is reference
 default path stays declarative; the exotic path stays contained.</p>
 <p>Spec types are authored once in TypeScript and shared by the generator (produces them), the runtime
 (consumes them), and the UI (renders them) — a single schema, no drift between layers.</p>
+<h3 id="41-metadata-driven-vs-code-generation--the-fork-under-the-keystone">4.1 Metadata-driven vs code-generation — the fork under the keystone</h3>
+<p>This is the single most consequential engineering decision, and it deserves to be stated head-on. There
+are two ways an AI can &quot;generate an app&quot;:</p>
+<ul>
+<li><strong>Metadata-driven (spec/declarative):</strong> the model emits <strong>structured data</strong> — an App Spec — that a
+fixed, human-written, well-tested runtime <em>interprets</em>. The model&#39;s output is data, validated against a
+schema. (What Ziroo does.)</li>
+<li><strong>Code-generation:</strong> the model emits <strong>source code</strong> (React components, handlers, SQL) that is compiled
+and run like a normal app. (What Replit / Base44 / v0-style tools do.)</li>
+</ul>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>Metadata-driven</th>
+<th>Code-generation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Reliability</td>
+<td>High — runtime is written once and tested; invalid model output is <em>rejected by the schema</em></td>
+<td>Lower — arbitrary code carries bugs, runtime errors, and a fresh security surface per app</td>
+</tr>
+<tr>
+<td>Coherence (Problem D)</td>
+<td>High <strong>by construction</strong> — one renderer, closed vocabulary</td>
+<td>Hard — every app is bespoke and drifts</td>
+</tr>
+<tr>
+<td>Non-engineer approval (Problem B)</td>
+<td>Possible — spec is semantic, renders to plain English</td>
+<td>Near-impossible — the artifact is a code diff</td>
+</tr>
+<tr>
+<td>Live edit / migration (Problem C)</td>
+<td>Easy — structured spec diff drives the migration</td>
+<td>Hard — code diffs are semantically opaque</td>
+</tr>
+<tr>
+<td>Generation cost</td>
+<td><strong>Low</strong> — compact JSON, cheaper models can fill a schema</td>
+<td><strong>High</strong> — many code tokens, frontier model, more retries</td>
+</tr>
+<tr>
+<td>Runtime cost</td>
+<td>~0 marginal — one shared interpreter fleet (§10)</td>
+<td>Per-app compute / containers</td>
+</tr>
+<tr>
+<td>Generation latency</td>
+<td>Fast — small structured output</td>
+<td>Slow — long code emission</td>
+</tr>
+<tr>
+<td>Safety</td>
+<td>Tiny attack surface — no arbitrary code</td>
+<td>Large — every app needs a hardware sandbox</td>
+</tr>
+<tr>
+<td>Debuggability</td>
+<td>Deterministic runtime + inspectable spec (§23)</td>
+<td>Debugging generated code</td>
+</tr>
+</tbody></table></div>
+<p><strong>Decision (D3, restated):</strong> <strong>metadata-driven is the default for ~95% of internal tools; code is a
+quarantined escape hatch for the rest.</strong> The reasoning is not &quot;metadata is nicer&quot; — it is that <em>every
+promise Ziroo makes is only reachable through metadata</em>. Coherence, non-engineer approval, plain-English
+edits, near-zero runtime cost, safety, and cheap fast generation <strong>all break</strong> the moment the default
+output is code. So code is never the default; it is the exception, and even then it is confined to
+<em>logic, never presentation</em> (§10.2), so it cannot break coherence.</p>
+<p>Rejected — <strong>code-gen as the default</strong> (the obvious, demo-friendly choice): it optimizes for the one
+thing (raw flexibility) that internal tools need least, at the cost of the six things they need most.</p>
+<h3 id="42-default-widgets-vs-dynamic-widgets">4.2 Default widgets vs dynamic widgets</h3>
+<p>A &quot;widget&quot; is a UI building block — a view type (table, form, detail, dashboard, approval-queue, calendar,
+kanban, chart…). The parallel fork to §4.1, at the UI layer:</p>
+<ul>
+<li><strong>Default widgets:</strong> a fixed, hand-built, curated catalog. The model <strong>selects and configures</strong> from it.
+Tested, accessible, themed, coherent. Bounded by the catalog.</li>
+<li><strong>Dynamic widgets:</strong> the model <strong>invents</strong> new widget types on the fly (custom-rendered, usually code).
+Infinitely flexible; breaks coherence, accessibility, and cost.</li>
+</ul>
+<p><strong>Decision:</strong> default widgets are the vocabulary; &quot;dynamic&quot; needs are met by a four-rung ladder that
+almost never reaches arbitrary code — because <strong>dynamic must not mean &quot;arbitrary per-app UI.&quot;</strong></p>
+<ol>
+<li><strong>Configuration, not invention.</strong> Default widgets are richly parameterized — a <code>table</code> supports
+grouping, filters, inline edit, computed columns, conditional formatting, row actions. Most &quot;custom&quot;
+requests are satisfied by <em>configuring</em> a default, not inventing a widget.</li>
+<li><strong>Composition.</strong> Novel layouts come from <em>combining</em> default widgets (a dashboard is tiles of them),
+not new primitives.</li>
+<li><strong>Catalog evolution.</strong> When a genuinely new pattern <em>recurs</em> (measured by escape-hatch frequency,
+§32), a human adds it to the catalog <strong>once</strong> — tested, themed, accessible — and it becomes a default
+available to <em>every</em> app. Dynamic needs become default widgets over time, through a curated pipeline.</li>
+<li><strong>True escape hatch (rare).</strong> Only if 1–3 fail: a sandboxed custom widget, visually constrained to the
+design tokens, logic quarantined per §10.2. Instrumented so recurring uses feed rung 3.</li>
+</ol>
+<p>This is how Ziroo gets flexibility <em>and</em> keeps fifty apps looking like one product (§15): the surface the
+model draws from is closed and curated; it grows deliberately, not per-app.</p>
+<h3 id="43-when-metadata-grows--keeping-token-cost-and-latency-flat">4.3 When metadata grows — keeping token cost and latency flat</h3>
+<p>The sharpest objection to metadata-driven generation: as an account accumulates apps, entities,
+connected-tool schemas, glossary, and prior specs, the <strong>context</strong> the model needs seems to grow without
+bound → more input tokens → higher cost and latency. If we naively concatenated everything, this would be
+fatal at scale. We do not. Prompt size is engineered to scale with <strong>the change</strong>, not <strong>the account</strong>:</p>
+<ul>
+<li><strong>Retrieve, don&#39;t dump (§9).</strong> Context is assembled by <em>relevance</em> — only the entities, specs, and
+schemas the current request touches are retrieved (top-k, permission-filtered). Account-level growth
+does not linearly grow the prompt.</li>
+<li><strong>Slice the spec for edits.</strong> &quot;Add an approval step&quot; needs only the workflow + roles sub-tree, not the
+whole data model and every view. We send the slice, patch it, merge back — so edit-prompt size is flat
+regardless of total app size.</li>
+<li><strong>Digests before detail (multi-resolution).</strong> A large spec has a compact <strong>digest</strong> (entities, view
+types, key fields). The cheap <strong>planner</strong> works on digests to decide <em>what</em> to touch; only the targeted
+generation pulls full detail for that one slice. Planning cost is sub-linear in app size.</li>
+<li><strong>Emit patches, not rewrites.</strong> The model returns a structured <strong>delta</strong> (JSON-patch-style) to the
+spec, never the whole new spec. Output tokens stay small even for large apps — and the blast radius of
+a bad generation shrinks with it.</li>
+<li><strong>Prompt caching (§19).</strong> The stable layers — system prompt, design vocabulary, account glossary, the
+app&#39;s base spec — are provider-prompt-cached, so multi-turn work doesn&#39;t re-pay for them.</li>
+<li><strong>Budgeted, deterministic assembly (§7).</strong> Every context layer has a token budget; retrieval is capped;
+overflow drops least-relevant. Latency is bounded by construction.</li>
+</ul>
+<p><strong>The decisive structural fact:</strong> the LLM touches metadata <strong>only at build/edit time</strong>. The runtime that
+<em>serves</em> live apps is <strong>LLM-free</strong> — it interprets the spec with deterministic compute (§10). So metadata
+size affects only build-time prompts (handled above) and <strong>never</strong> per-request serving cost or latency.
+Growth is a generation-plane concern, bounded by retrieval and slicing — not a runtime tax.</p>
+<h3 id="44-when-code-is-unavoidable--reliability-consistency-and-cost">4.4 When code is unavoidable — reliability, consistency, and cost</h3>
+<p>For the escape hatch (§10.2), generated code must be as trustworthy as the metadata path. Three problems,
+three answers:</p>
+<ul>
+<li><strong>Reliability.</strong> Generated code is treated as a <strong>tested, pinned artifact — generated once, not
+re-emitted per run.</strong> It is confined to <em>pure, typed, single-purpose functions</em> (compute a value,
+transform data — no UI, no ad-hoc I/O). Before it is allowed to run it must pass the Verify gate (§6):
+type-check, lint, <strong>auto-generated unit tests</strong> (derived from the spec&#39;s declared intent + examples),
+execution in the sandbox against synthetic inputs, and a security scan. A declared <strong>input/output
+contract</strong> (from the spec) is enforced at the runtime boundary every call — if the function returns
+garbage, the contract check catches it and the runtime falls back safely.</li>
+<li><strong>Consistency.</strong> One sandbox runtime, one standard library, one generated-code style, one lint/review
+gate. Every function looks and behaves like every other. No per-app bespoke stacks.</li>
+<li><strong>Cost.</strong> Code-gen is <strong>amortized</strong> — one expensive build, reused across all future requests — so
+frontier-model code-gen happens rarely. And it sits at the top of an <strong>escalation ladder</strong> climbed only
+when the cheaper rung fails: <em>default-widget config → composition → <strong>formula/expression</strong> (§4.5) →
+sandboxed code</em>. Recurring code patterns are promoted down to defaults (§4.2) so future apps never pay
+for them again. Semantic caching reuses prior artifacts for near-duplicate requests.</li>
+</ul>
+<p>Net: expensive, less-reliable code is pushed to the last rung, generated once, contract-checked, and
+sandboxed — so its cost is amortized and its blast radius contained.</p>
+<h3 id="45-formulas--static-dynamic-and-how-the-balance-actually-decrements">4.5 Formulas — static, dynamic, and how the balance actually decrements</h3>
+<p>Most &quot;calculations&quot; internal tools need — a leave balance, <code>days = to − from</code>, <code>total = qty × price</code>,
+running totals, roll-ups, conditional statuses — are <strong>not code</strong>. Making them first-class is what lets
+Ziroo avoid the escape hatch for the common case.</p>
+<p><strong>Formulas are a first-class spec field: a safe expression language, not code.</strong> The generator emits an
+expression like <code>allowance - sum(LeaveRequest where status = approved).days</code>. Because it is a sandboxed
+pure evaluator (no arbitrary code, no I/O), it is reliable, cheap to generate (a short string from a
+cheap model), deterministic, and <strong>explainable in plain English</strong> for the approval gate (§12).</p>
+<p>The runtime&#39;s <strong>formula engine</strong> chooses the evaluation strategy <em>declaratively, from the spec</em> — the
+static-vs-dynamic decision is made per formula, not globally:</p>
+<ul>
+<li><strong>Derived (dynamic — evaluated on read):</strong> cheap, row-local computations (<code>days</code>, <code>total</code>, a status).
+Nothing stored; always fresh. Best when the formula is cheap and the inputs are on the same record.</li>
+<li><strong>Materialized (static — stored, incrementally maintained):</strong> expensive aggregates and cross-row
+roll-ups (a <strong>leave balance</strong>, a running total). Stored, and kept correct by an <strong>event-driven trigger
+auto-derived from the formula&#39;s dependencies</strong> — e.g. <em>on <code>LeaveRequest.approved</code> → decrement balance</em>.
+This is exactly how &quot;balances decrement automatically&quot; works: it is a materialized formula maintained
+by a workflow (§18) the generator wrote from the formula&#39;s dependency graph — no hand-coded trigger.</li>
+<li><strong>Snapshot (point-in-time static):</strong> values that must be <em>frozen</em> (the &quot;balance after this request&quot;
+shown at approval time) are computed once at that event and stored immutably.</li>
+</ul>
+<p>Supporting machinery: a <strong>dependency DAG</strong> across formulas means a data change recomputes only the
+downstream materialized values (incremental, never a full re-scan), so there are no recompute storms and
+no staleness. Materialized updates run <strong>inside the triggering transaction</strong> (or a durable workflow for
+cross-entity cases, §18) and are idempotent, so a decrement can never be lost or double-applied. Only when
+an expression genuinely cannot express the computation does the engine escalate to sandboxed code (§4.4) —
+which must satisfy the same input/output contract. In practice that is rare; formulas cover the long tail
+of &quot;calculations&quot; at a fraction of the cost and risk of code.</p>
 <hr>
 <h2 id="5-multi-tenancy--isolation">5. Multi-tenancy &amp; isolation</h2>
 <p><strong>Tenancy model:</strong> <em>pool by default, silo on demand</em> (the &quot;bridge&quot; model), chosen per data class.</p>
@@ -1009,9 +1226,13 @@ It renders views from the shared component library, executes declarative workflo
 per-app data store — all through the central policy engine. No app-specific process, no per-app deploy.</p>
 <ul>
 <li><strong>Cost:</strong> one horizontally-scaled fleet serves thousands of apps; publishing a new app is writing a
-spec row, not provisioning infra → <strong>near-zero marginal cost and instant deploy/rollback</strong>.</li>
+spec row, not provisioning infra → <strong>near-zero marginal cost and instant deploy/rollback</strong>. It is
+<strong>LLM-free</strong> — no model call per request — so serving cost/latency is independent of spec size (§4.3).</li>
 <li><strong>Safety:</strong> closed vocabulary → tiny attack surface; no arbitrary code executes here.</li>
 <li><strong>Coherence:</strong> one renderer → every app looks and behaves like one product (§15).</li>
+<li><strong>Formula engine:</strong> interprets the spec&#39;s declarative formulas, choosing <em>derived</em> (on-read),
+<em>materialized</em> (stored + incrementally maintained via dependency-triggered workflows), or <em>snapshot</em>
+(frozen at an event) per formula — this is how balances decrement automatically (§4.5).</li>
 </ul>
 <p><strong>10.2 Code sandbox (the escape hatch).</strong> When the spec references a code function (custom calc,
 exotic transform, unusual integration), it runs in an isolated <strong>Firecracker microVM</strong> (via Fargate),
@@ -1696,6 +1917,15 @@ backstop.</li>
 human approval of effects.</li>
 <li><strong>Cost runaway</strong> if metering/quotas lag adoption. <em>Mitigation:</em> budgets and metering from Phase 1,
   not bolted on later (§24).</li>
+<li><strong>Metadata growth inflating prompts</strong> (§4.3) — if context assembly regresses to &quot;dump everything,&quot;
+  generation cost/latency grow with the account. <em>Mitigation:</em> retrieval + spec-slicing + digests +
+  patch-based edits + prompt caching; assert prompt size scales with the <em>change</em>, not the account, in CI.</li>
+<li><strong>Escape-hatch code cost &amp; reliability</strong> (§4.4) — over-reliance on generated code is expensive and
+  fragile. <em>Mitigation:</em> the escalation ladder (config → composition → formula → code), generate-once +
+  contract-checked + sandboxed artifacts, and promote-recurring-patterns-to-defaults; track code-rung hit rate.</li>
+<li><strong>Formula materialization edge cases</strong> (§4.5) — a wrong static/dynamic choice or a missed dependency
+  causes stale or storming recomputes. <em>Mitigation:</em> dependency-DAG-driven incremental updates inside the
+  triggering transaction, idempotent maintenance, and dry-run verification of derived values in preview.</li>
 </ol>
 <p><strong>Questions worth resolving next</strong> (deliberately left open here): exact plan/pricing tiers and their
 quota shapes; which connectors ship in Phase 0; whether to buy or build enterprise SSO/IdP; the initial
@@ -1759,6 +1989,11 @@ incrementally · Hybrid app runtime (managed runtime + code escape hatch) · AWS
 2. [Foundational decisions (ADR summary)](#2-foundational-decisions-adr-summary)
 3. [The 10,000-ft view: three planes](#3-the-10000-ft-view-three-planes)
 4. [The App Spec — the keystone abstraction](#4-the-app-spec--the-keystone-abstraction)
+   - [4.1 Metadata-driven vs code-generation](#41-metadata-driven-vs-code-generation--the-fork-under-the-keystone)
+   - [4.2 Default widgets vs dynamic widgets](#42-default-widgets-vs-dynamic-widgets)
+   - [4.3 When metadata grows — token cost &amp; latency](#43-when-metadata-grows--keeping-token-cost-and-latency-flat)
+   - [4.4 When code is unavoidable — reliability, consistency, cost](#44-when-code-is-unavoidable--reliability-consistency-and-cost)
+   - [4.5 Formulas — static, dynamic, and the auto-decrement](#45-formulas--static-dynamic-and-how-the-balance-actually-decrements)
 5. [Multi-tenancy &amp; isolation](#5-multi-tenancy--isolation)
 6. [The generation pipeline (prompt → app)](#6-the-generation-pipeline-prompt--app)
 7. [Prompt handling](#7-prompt-handling)
@@ -1842,6 +2077,8 @@ Zite, Rocket) are weak or silent. They are load-bearing requirements, not featur
 | D6  | Primary language      | **TypeScript end to end**                                        | One talent pool; spec *types* shared between generator, runtime, and UI; Go reserved for hot-path infra services.                                                                          |
 | D7  | Durable orchestration | **Temporal**                                                     | Generation is a minutes-long, resumable, partially-failing workflow — exactly Temporal's job.                                                                                              |
 | D8  | Authorization         | **Centralized policy engine (Cedar / AWS Verified Permissions)** | Role isolation is a platform guarantee; policies are declared in the spec and evaluated centrally, never hand-written per app.                                                             |
+| D9  | UI vocabulary         | **Default widgets, curated catalog that grows**                  | Coherence + accessibility + cost require a closed, tested widget set the model *configures*; recurring "dynamic" needs graduate into defaults, never per-app bespoke UI (§4.2).            |
+| D10 | Computation model     | **Safe formula expressions; escalate to code only when needed**  | Most calculations are declarative formulas (cheap, safe, explainable); the runtime picks derived vs materialized vs snapshot; code is the last rung of the escalation ladder (§4.4–4.5).  |
 
 
 Rejected at this level:
@@ -1991,6 +2228,150 @@ default path stays declarative; the exotic path stays contained.
 
 Spec types are authored once in TypeScript and shared by the generator (produces them), the runtime
 (consumes them), and the UI (renders them) — a single schema, no drift between layers.
+
+### 4.1 Metadata-driven vs code-generation — the fork under the keystone
+
+This is the single most consequential engineering decision, and it deserves to be stated head-on. There
+are two ways an AI can "generate an app":
+
+- **Metadata-driven (spec/declarative):** the model emits **structured data** — an App Spec — that a
+  fixed, human-written, well-tested runtime *interprets*. The model's output is data, validated against a
+  schema. (What Ziroo does.)
+- **Code-generation:** the model emits **source code** (React components, handlers, SQL) that is compiled
+  and run like a normal app. (What Replit / Base44 / v0-style tools do.)
+
+| Dimension | Metadata-driven | Code-generation |
+|-----------|-----------------|-----------------|
+| Reliability | High — runtime is written once and tested; invalid model output is *rejected by the schema* | Lower — arbitrary code carries bugs, runtime errors, and a fresh security surface per app |
+| Coherence (Problem D) | High **by construction** — one renderer, closed vocabulary | Hard — every app is bespoke and drifts |
+| Non-engineer approval (Problem B) | Possible — spec is semantic, renders to plain English | Near-impossible — the artifact is a code diff |
+| Live edit / migration (Problem C) | Easy — structured spec diff drives the migration | Hard — code diffs are semantically opaque |
+| Generation cost | **Low** — compact JSON, cheaper models can fill a schema | **High** — many code tokens, frontier model, more retries |
+| Runtime cost | ~0 marginal — one shared interpreter fleet (§10) | Per-app compute / containers |
+| Generation latency | Fast — small structured output | Slow — long code emission |
+| Safety | Tiny attack surface — no arbitrary code | Large — every app needs a hardware sandbox |
+| Debuggability | Deterministic runtime + inspectable spec (§23) | Debugging generated code |
+
+**Decision (D3, restated):** **metadata-driven is the default for ~95% of internal tools; code is a
+quarantined escape hatch for the rest.** The reasoning is not "metadata is nicer" — it is that *every
+promise Ziroo makes is only reachable through metadata*. Coherence, non-engineer approval, plain-English
+edits, near-zero runtime cost, safety, and cheap fast generation **all break** the moment the default
+output is code. So code is never the default; it is the exception, and even then it is confined to
+*logic, never presentation* (§10.2), so it cannot break coherence.
+
+Rejected — **code-gen as the default** (the obvious, demo-friendly choice): it optimizes for the one
+thing (raw flexibility) that internal tools need least, at the cost of the six things they need most.
+
+### 4.2 Default widgets vs dynamic widgets
+
+A "widget" is a UI building block — a view type (table, form, detail, dashboard, approval-queue, calendar,
+kanban, chart…). The parallel fork to §4.1, at the UI layer:
+
+- **Default widgets:** a fixed, hand-built, curated catalog. The model **selects and configures** from it.
+  Tested, accessible, themed, coherent. Bounded by the catalog.
+- **Dynamic widgets:** the model **invents** new widget types on the fly (custom-rendered, usually code).
+  Infinitely flexible; breaks coherence, accessibility, and cost.
+
+**Decision:** default widgets are the vocabulary; "dynamic" needs are met by a four-rung ladder that
+almost never reaches arbitrary code — because **dynamic must not mean "arbitrary per-app UI."**
+
+1. **Configuration, not invention.** Default widgets are richly parameterized — a `table` supports
+   grouping, filters, inline edit, computed columns, conditional formatting, row actions. Most "custom"
+   requests are satisfied by *configuring* a default, not inventing a widget.
+2. **Composition.** Novel layouts come from *combining* default widgets (a dashboard is tiles of them),
+   not new primitives.
+3. **Catalog evolution.** When a genuinely new pattern *recurs* (measured by escape-hatch frequency,
+   §32), a human adds it to the catalog **once** — tested, themed, accessible — and it becomes a default
+   available to *every* app. Dynamic needs become default widgets over time, through a curated pipeline.
+4. **True escape hatch (rare).** Only if 1–3 fail: a sandboxed custom widget, visually constrained to the
+   design tokens, logic quarantined per §10.2. Instrumented so recurring uses feed rung 3.
+
+This is how Ziroo gets flexibility *and* keeps fifty apps looking like one product (§15): the surface the
+model draws from is closed and curated; it grows deliberately, not per-app.
+
+### 4.3 When metadata grows — keeping token cost and latency flat
+
+The sharpest objection to metadata-driven generation: as an account accumulates apps, entities,
+connected-tool schemas, glossary, and prior specs, the **context** the model needs seems to grow without
+bound → more input tokens → higher cost and latency. If we naively concatenated everything, this would be
+fatal at scale. We do not. Prompt size is engineered to scale with **the change**, not **the account**:
+
+- **Retrieve, don't dump (§9).** Context is assembled by *relevance* — only the entities, specs, and
+  schemas the current request touches are retrieved (top-k, permission-filtered). Account-level growth
+  does not linearly grow the prompt.
+- **Slice the spec for edits.** "Add an approval step" needs only the workflow + roles sub-tree, not the
+  whole data model and every view. We send the slice, patch it, merge back — so edit-prompt size is flat
+  regardless of total app size.
+- **Digests before detail (multi-resolution).** A large spec has a compact **digest** (entities, view
+  types, key fields). The cheap **planner** works on digests to decide *what* to touch; only the targeted
+  generation pulls full detail for that one slice. Planning cost is sub-linear in app size.
+- **Emit patches, not rewrites.** The model returns a structured **delta** (JSON-patch-style) to the
+  spec, never the whole new spec. Output tokens stay small even for large apps — and the blast radius of
+  a bad generation shrinks with it.
+- **Prompt caching (§19).** The stable layers — system prompt, design vocabulary, account glossary, the
+  app's base spec — are provider-prompt-cached, so multi-turn work doesn't re-pay for them.
+- **Budgeted, deterministic assembly (§7).** Every context layer has a token budget; retrieval is capped;
+  overflow drops least-relevant. Latency is bounded by construction.
+
+**The decisive structural fact:** the LLM touches metadata **only at build/edit time**. The runtime that
+*serves* live apps is **LLM-free** — it interprets the spec with deterministic compute (§10). So metadata
+size affects only build-time prompts (handled above) and **never** per-request serving cost or latency.
+Growth is a generation-plane concern, bounded by retrieval and slicing — not a runtime tax.
+
+### 4.4 When code is unavoidable — reliability, consistency, and cost
+
+For the escape hatch (§10.2), generated code must be as trustworthy as the metadata path. Three problems,
+three answers:
+
+- **Reliability.** Generated code is treated as a **tested, pinned artifact — generated once, not
+  re-emitted per run.** It is confined to *pure, typed, single-purpose functions* (compute a value,
+  transform data — no UI, no ad-hoc I/O). Before it is allowed to run it must pass the Verify gate (§6):
+  type-check, lint, **auto-generated unit tests** (derived from the spec's declared intent + examples),
+  execution in the sandbox against synthetic inputs, and a security scan. A declared **input/output
+  contract** (from the spec) is enforced at the runtime boundary every call — if the function returns
+  garbage, the contract check catches it and the runtime falls back safely.
+- **Consistency.** One sandbox runtime, one standard library, one generated-code style, one lint/review
+  gate. Every function looks and behaves like every other. No per-app bespoke stacks.
+- **Cost.** Code-gen is **amortized** — one expensive build, reused across all future requests — so
+  frontier-model code-gen happens rarely. And it sits at the top of an **escalation ladder** climbed only
+  when the cheaper rung fails: *default-widget config → composition → **formula/expression** (§4.5) →
+  sandboxed code*. Recurring code patterns are promoted down to defaults (§4.2) so future apps never pay
+  for them again. Semantic caching reuses prior artifacts for near-duplicate requests.
+
+Net: expensive, less-reliable code is pushed to the last rung, generated once, contract-checked, and
+sandboxed — so its cost is amortized and its blast radius contained.
+
+### 4.5 Formulas — static, dynamic, and how the balance actually decrements
+
+Most "calculations" internal tools need — a leave balance, `days = to − from`, `total = qty × price`,
+running totals, roll-ups, conditional statuses — are **not code**. Making them first-class is what lets
+Ziroo avoid the escape hatch for the common case.
+
+**Formulas are a first-class spec field: a safe expression language, not code.** The generator emits an
+expression like `allowance - sum(LeaveRequest where status = approved).days`. Because it is a sandboxed
+pure evaluator (no arbitrary code, no I/O), it is reliable, cheap to generate (a short string from a
+cheap model), deterministic, and **explainable in plain English** for the approval gate (§12).
+
+The runtime's **formula engine** chooses the evaluation strategy *declaratively, from the spec* — the
+static-vs-dynamic decision is made per formula, not globally:
+
+- **Derived (dynamic — evaluated on read):** cheap, row-local computations (`days`, `total`, a status).
+  Nothing stored; always fresh. Best when the formula is cheap and the inputs are on the same record.
+- **Materialized (static — stored, incrementally maintained):** expensive aggregates and cross-row
+  roll-ups (a **leave balance**, a running total). Stored, and kept correct by an **event-driven trigger
+  auto-derived from the formula's dependencies** — e.g. *on `LeaveRequest.approved` → decrement balance*.
+  This is exactly how "balances decrement automatically" works: it is a materialized formula maintained
+  by a workflow (§18) the generator wrote from the formula's dependency graph — no hand-coded trigger.
+- **Snapshot (point-in-time static):** values that must be *frozen* (the "balance after this request"
+  shown at approval time) are computed once at that event and stored immutably.
+
+Supporting machinery: a **dependency DAG** across formulas means a data change recomputes only the
+downstream materialized values (incremental, never a full re-scan), so there are no recompute storms and
+no staleness. Materialized updates run **inside the triggering transaction** (or a durable workflow for
+cross-entity cases, §18) and are idempotent, so a decrement can never be lost or double-applied. Only when
+an expression genuinely cannot express the computation does the engine escalate to sandboxed code (§4.4) —
+which must satisfy the same input/output contract. In practice that is rare; formulas cover the long tail
+of "calculations" at a fraction of the cost and risk of code.
 
 ---
 
@@ -2185,9 +2566,13 @@ It renders views from the shared component library, executes declarative workflo
 per-app data store — all through the central policy engine. No app-specific process, no per-app deploy.
 
 - **Cost:** one horizontally-scaled fleet serves thousands of apps; publishing a new app is writing a
-spec row, not provisioning infra → **near-zero marginal cost and instant deploy/rollback**.
+spec row, not provisioning infra → **near-zero marginal cost and instant deploy/rollback**. It is
+**LLM-free** — no model call per request — so serving cost/latency is independent of spec size (§4.3).
 - **Safety:** closed vocabulary → tiny attack surface; no arbitrary code executes here.
 - **Coherence:** one renderer → every app looks and behaves like one product (§15).
+- **Formula engine:** interprets the spec's declarative formulas, choosing *derived* (on-read),
+*materialized* (stored + incrementally maintained via dependency-triggered workflows), or *snapshot*
+(frozen at an event) per formula — this is how balances decrement automatically (§4.5).
 
 **10.2 Code sandbox (the escape hatch).** When the spec references a code function (custom calc,
 exotic transform, unusual integration), it runs in an isolated **Firecracker microVM** (via Fargate),
@@ -2793,6 +3178,15 @@ cheaper and faster to iterate; revisit only if unit economics demand it.
    human approval of effects.
 5. **Cost runaway** if metering/quotas lag adoption. *Mitigation:* budgets and metering from Phase 1,
   not bolted on later (§24).
+6. **Metadata growth inflating prompts** (§4.3) — if context assembly regresses to "dump everything,"
+  generation cost/latency grow with the account. *Mitigation:* retrieval + spec-slicing + digests +
+  patch-based edits + prompt caching; assert prompt size scales with the *change*, not the account, in CI.
+7. **Escape-hatch code cost &amp; reliability** (§4.4) — over-reliance on generated code is expensive and
+  fragile. *Mitigation:* the escalation ladder (config → composition → formula → code), generate-once +
+  contract-checked + sandboxed artifacts, and promote-recurring-patterns-to-defaults; track code-rung hit rate.
+8. **Formula materialization edge cases** (§4.5) — a wrong static/dynamic choice or a missed dependency
+  causes stale or storming recomputes. *Mitigation:* dependency-DAG-driven incremental updates inside the
+  triggering transaction, idempotent maintenance, and dry-run verification of derived values in preview.
 
 **Questions worth resolving next** (deliberately left open here): exact plan/pricing tiers and their
 quota shapes; which connectors ship in Phase 0; whether to buy or build enterprise SSO/IdP; the initial

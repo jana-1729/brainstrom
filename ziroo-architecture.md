@@ -26,6 +26,11 @@ incrementally · Hybrid app runtime (managed runtime + code escape hatch) · AWS
 2. [Foundational decisions (ADR summary)](#2-foundational-decisions-adr-summary)
 3. [The 10,000-ft view: three planes](#3-the-10000-ft-view-three-planes)
 4. [The App Spec — the keystone abstraction](#4-the-app-spec--the-keystone-abstraction)
+   - [4.1 Metadata-driven vs code-generation](#41-metadata-driven-vs-code-generation--the-fork-under-the-keystone)
+   - [4.2 Default widgets vs dynamic widgets](#42-default-widgets-vs-dynamic-widgets)
+   - [4.3 When metadata grows — token cost & latency](#43-when-metadata-grows--keeping-token-cost-and-latency-flat)
+   - [4.4 When code is unavoidable — reliability, consistency, cost](#44-when-code-is-unavoidable--reliability-consistency-and-cost)
+   - [4.5 Formulas — static, dynamic, and the auto-decrement](#45-formulas--static-dynamic-and-how-the-balance-actually-decrements)
 5. [Multi-tenancy & isolation](#5-multi-tenancy--isolation)
 6. [The generation pipeline (prompt → app)](#6-the-generation-pipeline-prompt--app)
 7. [Prompt handling](#7-prompt-handling)
@@ -109,6 +114,8 @@ Zite, Rocket) are weak or silent. They are load-bearing requirements, not featur
 | D6  | Primary language      | **TypeScript end to end**                                        | One talent pool; spec *types* shared between generator, runtime, and UI; Go reserved for hot-path infra services.                                                                          |
 | D7  | Durable orchestration | **Temporal**                                                     | Generation is a minutes-long, resumable, partially-failing workflow — exactly Temporal's job.                                                                                              |
 | D8  | Authorization         | **Centralized policy engine (Cedar / AWS Verified Permissions)** | Role isolation is a platform guarantee; policies are declared in the spec and evaluated centrally, never hand-written per app.                                                             |
+| D9  | UI vocabulary         | **Default widgets, curated catalog that grows**                  | Coherence + accessibility + cost require a closed, tested widget set the model *configures*; recurring "dynamic" needs graduate into defaults, never per-app bespoke UI (§4.2).            |
+| D10 | Computation model     | **Safe formula expressions; escalate to code only when needed**  | Most calculations are declarative formulas (cheap, safe, explainable); the runtime picks derived vs materialized vs snapshot; code is the last rung of the escalation ladder (§4.4–4.5).  |
 
 
 Rejected at this level:
@@ -258,6 +265,150 @@ default path stays declarative; the exotic path stays contained.
 
 Spec types are authored once in TypeScript and shared by the generator (produces them), the runtime
 (consumes them), and the UI (renders them) — a single schema, no drift between layers.
+
+### 4.1 Metadata-driven vs code-generation — the fork under the keystone
+
+This is the single most consequential engineering decision, and it deserves to be stated head-on. There
+are two ways an AI can "generate an app":
+
+- **Metadata-driven (spec/declarative):** the model emits **structured data** — an App Spec — that a
+  fixed, human-written, well-tested runtime *interprets*. The model's output is data, validated against a
+  schema. (What Ziroo does.)
+- **Code-generation:** the model emits **source code** (React components, handlers, SQL) that is compiled
+  and run like a normal app. (What Replit / Base44 / v0-style tools do.)
+
+| Dimension | Metadata-driven | Code-generation |
+|-----------|-----------------|-----------------|
+| Reliability | High — runtime is written once and tested; invalid model output is *rejected by the schema* | Lower — arbitrary code carries bugs, runtime errors, and a fresh security surface per app |
+| Coherence (Problem D) | High **by construction** — one renderer, closed vocabulary | Hard — every app is bespoke and drifts |
+| Non-engineer approval (Problem B) | Possible — spec is semantic, renders to plain English | Near-impossible — the artifact is a code diff |
+| Live edit / migration (Problem C) | Easy — structured spec diff drives the migration | Hard — code diffs are semantically opaque |
+| Generation cost | **Low** — compact JSON, cheaper models can fill a schema | **High** — many code tokens, frontier model, more retries |
+| Runtime cost | ~0 marginal — one shared interpreter fleet (§10) | Per-app compute / containers |
+| Generation latency | Fast — small structured output | Slow — long code emission |
+| Safety | Tiny attack surface — no arbitrary code | Large — every app needs a hardware sandbox |
+| Debuggability | Deterministic runtime + inspectable spec (§23) | Debugging generated code |
+
+**Decision (D3, restated):** **metadata-driven is the default for ~95% of internal tools; code is a
+quarantined escape hatch for the rest.** The reasoning is not "metadata is nicer" — it is that *every
+promise Ziroo makes is only reachable through metadata*. Coherence, non-engineer approval, plain-English
+edits, near-zero runtime cost, safety, and cheap fast generation **all break** the moment the default
+output is code. So code is never the default; it is the exception, and even then it is confined to
+*logic, never presentation* (§10.2), so it cannot break coherence.
+
+Rejected — **code-gen as the default** (the obvious, demo-friendly choice): it optimizes for the one
+thing (raw flexibility) that internal tools need least, at the cost of the six things they need most.
+
+### 4.2 Default widgets vs dynamic widgets
+
+A "widget" is a UI building block — a view type (table, form, detail, dashboard, approval-queue, calendar,
+kanban, chart…). The parallel fork to §4.1, at the UI layer:
+
+- **Default widgets:** a fixed, hand-built, curated catalog. The model **selects and configures** from it.
+  Tested, accessible, themed, coherent. Bounded by the catalog.
+- **Dynamic widgets:** the model **invents** new widget types on the fly (custom-rendered, usually code).
+  Infinitely flexible; breaks coherence, accessibility, and cost.
+
+**Decision:** default widgets are the vocabulary; "dynamic" needs are met by a four-rung ladder that
+almost never reaches arbitrary code — because **dynamic must not mean "arbitrary per-app UI."**
+
+1. **Configuration, not invention.** Default widgets are richly parameterized — a `table` supports
+   grouping, filters, inline edit, computed columns, conditional formatting, row actions. Most "custom"
+   requests are satisfied by *configuring* a default, not inventing a widget.
+2. **Composition.** Novel layouts come from *combining* default widgets (a dashboard is tiles of them),
+   not new primitives.
+3. **Catalog evolution.** When a genuinely new pattern *recurs* (measured by escape-hatch frequency,
+   §32), a human adds it to the catalog **once** — tested, themed, accessible — and it becomes a default
+   available to *every* app. Dynamic needs become default widgets over time, through a curated pipeline.
+4. **True escape hatch (rare).** Only if 1–3 fail: a sandboxed custom widget, visually constrained to the
+   design tokens, logic quarantined per §10.2. Instrumented so recurring uses feed rung 3.
+
+This is how Ziroo gets flexibility *and* keeps fifty apps looking like one product (§15): the surface the
+model draws from is closed and curated; it grows deliberately, not per-app.
+
+### 4.3 When metadata grows — keeping token cost and latency flat
+
+The sharpest objection to metadata-driven generation: as an account accumulates apps, entities,
+connected-tool schemas, glossary, and prior specs, the **context** the model needs seems to grow without
+bound → more input tokens → higher cost and latency. If we naively concatenated everything, this would be
+fatal at scale. We do not. Prompt size is engineered to scale with **the change**, not **the account**:
+
+- **Retrieve, don't dump (§9).** Context is assembled by *relevance* — only the entities, specs, and
+  schemas the current request touches are retrieved (top-k, permission-filtered). Account-level growth
+  does not linearly grow the prompt.
+- **Slice the spec for edits.** "Add an approval step" needs only the workflow + roles sub-tree, not the
+  whole data model and every view. We send the slice, patch it, merge back — so edit-prompt size is flat
+  regardless of total app size.
+- **Digests before detail (multi-resolution).** A large spec has a compact **digest** (entities, view
+  types, key fields). The cheap **planner** works on digests to decide *what* to touch; only the targeted
+  generation pulls full detail for that one slice. Planning cost is sub-linear in app size.
+- **Emit patches, not rewrites.** The model returns a structured **delta** (JSON-patch-style) to the
+  spec, never the whole new spec. Output tokens stay small even for large apps — and the blast radius of
+  a bad generation shrinks with it.
+- **Prompt caching (§19).** The stable layers — system prompt, design vocabulary, account glossary, the
+  app's base spec — are provider-prompt-cached, so multi-turn work doesn't re-pay for them.
+- **Budgeted, deterministic assembly (§7).** Every context layer has a token budget; retrieval is capped;
+  overflow drops least-relevant. Latency is bounded by construction.
+
+**The decisive structural fact:** the LLM touches metadata **only at build/edit time**. The runtime that
+*serves* live apps is **LLM-free** — it interprets the spec with deterministic compute (§10). So metadata
+size affects only build-time prompts (handled above) and **never** per-request serving cost or latency.
+Growth is a generation-plane concern, bounded by retrieval and slicing — not a runtime tax.
+
+### 4.4 When code is unavoidable — reliability, consistency, and cost
+
+For the escape hatch (§10.2), generated code must be as trustworthy as the metadata path. Three problems,
+three answers:
+
+- **Reliability.** Generated code is treated as a **tested, pinned artifact — generated once, not
+  re-emitted per run.** It is confined to *pure, typed, single-purpose functions* (compute a value,
+  transform data — no UI, no ad-hoc I/O). Before it is allowed to run it must pass the Verify gate (§6):
+  type-check, lint, **auto-generated unit tests** (derived from the spec's declared intent + examples),
+  execution in the sandbox against synthetic inputs, and a security scan. A declared **input/output
+  contract** (from the spec) is enforced at the runtime boundary every call — if the function returns
+  garbage, the contract check catches it and the runtime falls back safely.
+- **Consistency.** One sandbox runtime, one standard library, one generated-code style, one lint/review
+  gate. Every function looks and behaves like every other. No per-app bespoke stacks.
+- **Cost.** Code-gen is **amortized** — one expensive build, reused across all future requests — so
+  frontier-model code-gen happens rarely. And it sits at the top of an **escalation ladder** climbed only
+  when the cheaper rung fails: *default-widget config → composition → **formula/expression** (§4.5) →
+  sandboxed code*. Recurring code patterns are promoted down to defaults (§4.2) so future apps never pay
+  for them again. Semantic caching reuses prior artifacts for near-duplicate requests.
+
+Net: expensive, less-reliable code is pushed to the last rung, generated once, contract-checked, and
+sandboxed — so its cost is amortized and its blast radius contained.
+
+### 4.5 Formulas — static, dynamic, and how the balance actually decrements
+
+Most "calculations" internal tools need — a leave balance, `days = to − from`, `total = qty × price`,
+running totals, roll-ups, conditional statuses — are **not code**. Making them first-class is what lets
+Ziroo avoid the escape hatch for the common case.
+
+**Formulas are a first-class spec field: a safe expression language, not code.** The generator emits an
+expression like `allowance - sum(LeaveRequest where status = approved).days`. Because it is a sandboxed
+pure evaluator (no arbitrary code, no I/O), it is reliable, cheap to generate (a short string from a
+cheap model), deterministic, and **explainable in plain English** for the approval gate (§12).
+
+The runtime's **formula engine** chooses the evaluation strategy *declaratively, from the spec* — the
+static-vs-dynamic decision is made per formula, not globally:
+
+- **Derived (dynamic — evaluated on read):** cheap, row-local computations (`days`, `total`, a status).
+  Nothing stored; always fresh. Best when the formula is cheap and the inputs are on the same record.
+- **Materialized (static — stored, incrementally maintained):** expensive aggregates and cross-row
+  roll-ups (a **leave balance**, a running total). Stored, and kept correct by an **event-driven trigger
+  auto-derived from the formula's dependencies** — e.g. *on `LeaveRequest.approved` → decrement balance*.
+  This is exactly how "balances decrement automatically" works: it is a materialized formula maintained
+  by a workflow (§18) the generator wrote from the formula's dependency graph — no hand-coded trigger.
+- **Snapshot (point-in-time static):** values that must be *frozen* (the "balance after this request"
+  shown at approval time) are computed once at that event and stored immutably.
+
+Supporting machinery: a **dependency DAG** across formulas means a data change recomputes only the
+downstream materialized values (incremental, never a full re-scan), so there are no recompute storms and
+no staleness. Materialized updates run **inside the triggering transaction** (or a durable workflow for
+cross-entity cases, §18) and are idempotent, so a decrement can never be lost or double-applied. Only when
+an expression genuinely cannot express the computation does the engine escalate to sandboxed code (§4.4) —
+which must satisfy the same input/output contract. In practice that is rare; formulas cover the long tail
+of "calculations" at a fraction of the cost and risk of code.
 
 ---
 
@@ -452,9 +603,13 @@ It renders views from the shared component library, executes declarative workflo
 per-app data store — all through the central policy engine. No app-specific process, no per-app deploy.
 
 - **Cost:** one horizontally-scaled fleet serves thousands of apps; publishing a new app is writing a
-spec row, not provisioning infra → **near-zero marginal cost and instant deploy/rollback**.
+spec row, not provisioning infra → **near-zero marginal cost and instant deploy/rollback**. It is
+**LLM-free** — no model call per request — so serving cost/latency is independent of spec size (§4.3).
 - **Safety:** closed vocabulary → tiny attack surface; no arbitrary code executes here.
 - **Coherence:** one renderer → every app looks and behaves like one product (§15).
+- **Formula engine:** interprets the spec's declarative formulas, choosing *derived* (on-read),
+*materialized* (stored + incrementally maintained via dependency-triggered workflows), or *snapshot*
+(frozen at an event) per formula — this is how balances decrement automatically (§4.5).
 
 **10.2 Code sandbox (the escape hatch).** When the spec references a code function (custom calc,
 exotic transform, unusual integration), it runs in an isolated **Firecracker microVM** (via Fargate),
@@ -1060,6 +1215,15 @@ cheaper and faster to iterate; revisit only if unit economics demand it.
    human approval of effects.
 5. **Cost runaway** if metering/quotas lag adoption. *Mitigation:* budgets and metering from Phase 1,
   not bolted on later (§24).
+6. **Metadata growth inflating prompts** (§4.3) — if context assembly regresses to "dump everything,"
+  generation cost/latency grow with the account. *Mitigation:* retrieval + spec-slicing + digests +
+  patch-based edits + prompt caching; assert prompt size scales with the *change*, not the account, in CI.
+7. **Escape-hatch code cost & reliability** (§4.4) — over-reliance on generated code is expensive and
+  fragile. *Mitigation:* the escalation ladder (config → composition → formula → code), generate-once +
+  contract-checked + sandboxed artifacts, and promote-recurring-patterns-to-defaults; track code-rung hit rate.
+8. **Formula materialization edge cases** (§4.5) — a wrong static/dynamic choice or a missed dependency
+  causes stale or storming recomputes. *Mitigation:* dependency-DAG-driven incremental updates inside the
+  triggering transaction, idempotent maintenance, and dry-run verification of derived values in preview.
 
 **Questions worth resolving next** (deliberately left open here): exact plan/pricing tiers and their
 quota shapes; which connectors ship in Phase 0; whether to buy or build enterprise SSO/IdP; the initial
