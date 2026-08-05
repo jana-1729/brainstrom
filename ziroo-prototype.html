@@ -1,0 +1,881 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Ziroo — Prototype</title>
+<style>
+  :root{
+    --ground:#FFFFFF; --surface:#FFFFFF; --surface-2:#F5F5F5; --surface-3:#EFEFEF;
+    --ink:#0A0A0A; --ink-soft:#3A3A3A; --ink-faint:#767676; --ink-ghost:#AFAFAF;
+    --line:#E4E4E4; --line-strong:#0A0A0A;
+    --ok:#0A0A0A; --warn-bd:#0A0A0A;
+    --shadow:0 1px 2px rgba(0,0,0,.05),0 12px 30px rgba(0,0,0,.08);
+    --radius:12px;
+    --fs:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --fm:ui-monospace,SFMono-Regular,"SF Mono","JetBrains Mono","Fira Code",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{ --ground:#0A0A0A; --surface:#121212; --surface-2:#1A1A1A; --surface-3:#232323;
+      --ink:#F4F4F4; --ink-soft:#C4C4C4; --ink-faint:#8A8A8A; --ink-ghost:#5A5A5A;
+      --line:#282828; --line-strong:#F4F4F4; --shadow:0 1px 2px rgba(0,0,0,.5),0 14px 36px rgba(0,0,0,.6);}
+  }
+  :root[data-theme="light"]{ --ground:#FFFFFF; --surface:#FFFFFF; --surface-2:#F5F5F5; --surface-3:#EFEFEF; --ink:#0A0A0A; --ink-soft:#3A3A3A; --ink-faint:#767676; --ink-ghost:#AFAFAF; --line:#E4E4E4; --line-strong:#0A0A0A; --shadow:0 1px 2px rgba(0,0,0,.05),0 12px 30px rgba(0,0,0,.08);}
+  :root[data-theme="dark"]{ --ground:#0A0A0A; --surface:#121212; --surface-2:#1A1A1A; --surface-3:#232323; --ink:#F4F4F4; --ink-soft:#C4C4C4; --ink-faint:#8A8A8A; --ink-ghost:#5A5A5A; --line:#282828; --line-strong:#F4F4F4; --shadow:0 1px 2px rgba(0,0,0,.5),0 14px 36px rgba(0,0,0,.6);}
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0; background:var(--ground); color:var(--ink); font-family:var(--fs); font-size:15px; line-height:1.5; -webkit-font-smoothing:antialiased; letter-spacing:-.003em; overflow:hidden}
+  ::selection{background:var(--ink); color:var(--ground)}
+  button{font:inherit; color:inherit; cursor:pointer; border:none; background:none}
+  .mono{font-family:var(--fm)}
+
+  /* ---------- top bar ---------- */
+  .top{height:54px; display:flex; align-items:center; gap:14px; padding:0 18px; border-bottom:1px solid var(--line); background:var(--surface); position:relative; z-index:30}
+  .brand{display:flex; align-items:center; gap:9px; font-weight:750; letter-spacing:-.02em}
+  .brand .mk{width:15px;height:15px;border:2.4px solid var(--ink);border-radius:4px;position:relative}
+  .brand .mk::after{content:"";position:absolute;inset:3px;background:var(--ink);border-radius:1px}
+  .url{flex:1; display:flex; justify-content:center}
+  .url .bar{display:flex; align-items:center; gap:8px; max-width:420px; width:100%; background:var(--surface-2); border:1px solid var(--line); border-radius:999px; padding:6px 12px; font-family:var(--fm); font-size:12px; color:var(--ink-faint)}
+  .url .bar .lock{width:11px;height:11px;border:1.5px solid currentColor;border-radius:2px;position:relative;flex:none}
+  .url .bar .lock::before{content:"";position:absolute;left:2.5px;right:2.5px;top:-3px;height:4px;border:1.5px solid currentColor;border-bottom:none;border-radius:4px 4px 0 0}
+  .url .bar b{color:var(--ink); font-weight:600}
+  .url .bar .u-live{margin-left:auto; font-size:10px; letter-spacing:.12em; color:var(--ground); background:var(--ink); padding:2px 7px; border-radius:999px; display:none}
+  body[data-live="1"] .url .bar .u-live{display:inline}
+  .top .actions{display:flex; align-items:center; gap:6px}
+  .iconbtn{width:34px;height:34px;border-radius:8px;display:grid;place-items:center;border:1px solid var(--line); color:var(--ink-soft); transition:background .15s,color .15s,border-color .15s}
+  .iconbtn:hover{background:var(--surface-2); color:var(--ink)}
+  .iconbtn svg{width:16px;height:16px}
+  .pill{font-family:var(--fm); font-size:11px; letter-spacing:.04em; padding:5px 10px; border:1px solid var(--line-strong); border-radius:999px; display:flex; align-items:center; gap:7px; white-space:nowrap}
+  .pill .d{width:7px;height:7px;border-radius:50%;background:var(--ink-ghost)}
+  .pill[data-tone="run"] .d{background:var(--ink); animation:blink 1s steps(2) infinite}
+  .pill[data-tone="live"]{background:var(--ink); color:var(--ground); border-color:var(--ink)}
+  .pill[data-tone="live"] .d{background:var(--ground)}
+  @keyframes blink{50%{opacity:.25}}
+
+  /* ---------- shell ---------- */
+  .stage{height:calc(100% - 54px); display:grid; grid-template-columns:404px minmax(0,1fr)}
+  .chat{border-right:1px solid var(--line); display:flex; flex-direction:column; min-height:0; background:var(--surface)}
+  .canvas{position:relative; overflow:hidden; background:var(--ground)}
+
+  /* ---------- chat header ---------- */
+  .chat-head{display:flex; align-items:center; gap:10px; padding:12px 18px; border-bottom:1px solid var(--line); background:var(--surface)}
+  .chat-head .cav{width:28px;height:28px;border-radius:8px;flex:none;display:grid;place-items:center;background:var(--ink);position:relative}
+  .chat-head .cav::after{content:"";width:11px;height:11px;border:1.7px solid var(--ground);border-radius:2px}
+  .chat-head .cav::before{content:"";position:absolute;width:4px;height:4px;background:var(--ground);border-radius:1px}
+  .chat-head .who b{font-size:14.5px;font-weight:750;letter-spacing:-.01em;display:block;line-height:1.2}
+  .chat-head .st{display:flex;align-items:center;gap:6px;font-family:var(--fm);font-size:11px;color:var(--ink-faint);margin-top:3px}
+  .chat-head .st .dot{width:6px;height:6px;border-radius:50%;background:var(--ink)}
+  .chat-head .st.think .dot{animation:blink 1s steps(2) infinite}
+  .chat-head .mini{margin-left:auto;font-family:var(--fm);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);border:1px solid var(--line);border-radius:999px;padding:4px 9px}
+
+  .msgs{flex:1; overflow-y:auto; padding:16px 18px 12px; display:flex; flex-direction:column; scroll-behavior:smooth}
+
+  /* ---------- messages ---------- */
+  .msg{display:grid; grid-template-columns:28px minmax(0,1fr); gap:10px; align-items:start; animation:rise .3s ease both; margin-top:14px}
+  .msg.grp{margin-top:4px}
+  .msg .av{width:28px;height:28px;border-radius:8px;flex:none;display:grid;place-items:center;background:var(--ink);position:relative}
+  .msg .av::after{content:"";width:11px;height:11px;border:1.7px solid var(--ground);border-radius:2px}
+  .msg .av::before{content:"";position:absolute;width:4px;height:4px;background:var(--ground);border-radius:1px}
+  .msg.grp .av{visibility:hidden;height:0}
+  .msg .col{min-width:0;display:flex;flex-direction:column;gap:5px}
+  .msg .meta{font-family:var(--fm);font-size:10.5px;letter-spacing:.02em;color:var(--ink-faint);display:flex;gap:7px;align-items:center}
+  .msg .meta b{color:var(--ink-soft);font-weight:600}
+  .msg.grp .meta{display:none}
+  .msg .bub{background:var(--surface-2); border:1px solid var(--line); border-radius:13px; border-top-left-radius:5px; padding:10px 13px; font-size:13.5px; line-height:1.56; color:var(--ink); width:fit-content; max-width:100%}
+  .msg.user{grid-template-columns:minmax(0,1fr); justify-items:end}
+  .msg.user .av{display:none}
+  .msg.user .col{align-items:flex-end}
+  .msg.user .meta{flex-direction:row-reverse}
+  .msg.user .bub{background:var(--ink); color:var(--ground); border-color:var(--ink); border-radius:13px; border-top-right-radius:5px}
+  .msg .bub .cursor{display:inline-block;width:6px;height:14px;background:currentColor;vertical-align:-2px;margin-left:2px;border-radius:1px;animation:blink .9s steps(2) infinite}
+  .msg .note{font-family:var(--fm); font-size:11px; color:var(--ink-faint); margin-top:8px; padding-top:8px; border-top:1px solid var(--line); letter-spacing:.02em}
+  /* thinking dots */
+  .msg .bub.think{display:flex;gap:5px;align-items:center;padding:13px 14px}
+  .msg .bub.think i{width:6px;height:6px;border-radius:50%;background:var(--ink-faint);animation:bounce 1.3s ease infinite}
+  .msg .bub.think i:nth-child(2){animation-delay:.16s}.msg .bub.think i:nth-child(3){animation-delay:.32s}
+  @keyframes bounce{0%,65%,100%{transform:translateY(0);opacity:.35}30%{transform:translateY(-5px);opacity:1}}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}}
+
+  /* ---------- composer ---------- */
+  .composer{border-top:1px solid var(--line); padding:13px 18px; background:var(--surface)}
+  .chips{display:flex; flex-wrap:wrap; gap:7px; margin-bottom:11px}
+  .chip{display:inline-flex;align-items:center;gap:8px;font-size:12.5px; padding:7px 12px 7px 8px; border:1px solid var(--line); border-radius:10px; color:var(--ink-soft); background:var(--surface); transition:.15s; text-align:left; line-height:1.3}
+  .chip:hover{border-color:var(--line-strong); color:var(--ink); background:var(--surface-2); transform:translateY(-1px)}
+  .chip .k{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:6px;background:var(--ink);color:var(--ground);flex:none}
+  .chip .k svg{width:12px;height:12px}
+  .inputrow{display:flex; align-items:flex-end; gap:8px; border:1.5px solid var(--line); border-radius:13px; padding:9px 9px 9px 14px; background:var(--surface); transition:border-color .15s, box-shadow .15s}
+  .inputrow:focus-within{border-color:var(--line-strong); box-shadow:0 0 0 3px color-mix(in srgb, var(--ink) 9%, transparent)}
+  .inputrow textarea{flex:1; border:none; outline:none; resize:none; background:none; color:var(--ink); font:inherit; font-size:14px; line-height:1.45; max-height:120px; min-height:22px; padding:2px 0}
+  .inputrow textarea::placeholder{color:var(--ink-ghost)}
+  .send{width:36px;height:36px;border-radius:10px;background:var(--ink);color:var(--ground);display:grid;place-items:center;flex:none;transition:.15s}
+  .send:hover{transform:translateY(-1px)}
+  .send:disabled{opacity:.3;cursor:not-allowed;transform:none}
+  .send svg{width:16px;height:16px}
+  .hintrow{display:flex;align-items:center;gap:7px;margin-top:9px;font-family:var(--fm);font-size:10.5px;color:var(--ink-faint);letter-spacing:.02em}
+  .hintrow .kbd{border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--ink-soft);min-width:16px;text-align:center}
+  .hintrow .sp{margin-left:auto}
+  .hint{position:absolute; inset:0; pointer-events:none}
+
+  /* ---------- canvas panels ---------- */
+  .panel{position:absolute; inset:0; padding:30px clamp(18px,4vw,54px); overflow-y:auto; opacity:0; transform:translateY(10px); pointer-events:none; transition:opacity .4s ease, transform .4s ease}
+  .panel[data-active="1"]{opacity:1; transform:none; pointer-events:auto}
+  .panel-head{display:flex; align-items:center; gap:12px; margin-bottom:4px}
+  .eyebrow{font-family:var(--fm); font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--ink-faint)}
+  .panel h2{font-size:clamp(1.3rem,2.4vw,1.7rem); font-weight:740; letter-spacing:-.022em; margin:8px 0 0}
+  .panel .sub{color:var(--ink-soft); margin:6px 0 0; max-width:60ch}
+
+  /* welcome */
+  .welcome{height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:4px}
+  .welcome .big{font-size:clamp(1.7rem,3.4vw,2.5rem); font-weight:800; letter-spacing:-.03em; max-width:16ch; text-wrap:balance}
+  .welcome .lede{color:var(--ink-soft); max-width:44ch; margin-top:10px}
+  .orbit{width:120px;height:120px;margin-bottom:20px;position:relative;display:grid;place-items:center}
+  .orbit .core{width:34px;height:34px;border:3px solid var(--ink);border-radius:9px;position:relative}
+  .orbit .core::after{content:"";position:absolute;inset:7px;background:var(--ink);border-radius:3px}
+  .orbit .ring{position:absolute;border:1px dashed var(--ink-ghost);border-radius:50%;animation:spin 14s linear infinite}
+  .orbit .r1{inset:14px}.orbit .r2{inset:0;animation-duration:22s;animation-direction:reverse}
+  .orbit .sat{position:absolute;width:8px;height:8px;background:var(--ink);border-radius:2px;top:-4px;left:calc(50% - 4px)}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .welcome .steps{margin-top:22px; display:flex; gap:10px; flex-wrap:wrap; justify-content:center; font-family:var(--fm); font-size:11px; color:var(--ink-faint)}
+  .welcome .steps span{border:1px solid var(--line); border-radius:999px; padding:5px 11px}
+
+  /* generation stages */
+  .genwrap{max-width:640px; margin:18px auto 0}
+  .genbar{display:flex; align-items:center; gap:14px; padding:14px 16px; border:1px solid var(--line-strong); border-radius:12px; background:var(--surface)}
+  .genbar .spin{width:20px;height:20px;border:2.4px solid var(--line);border-top-color:var(--ink);border-radius:50%;animation:spin .8s linear infinite;flex:none}
+  .genbar .gt{font-weight:640}
+  .genbar .gsub{font-family:var(--fm); font-size:12px; color:var(--ink-faint)}
+  .genbar .timer{margin-left:auto; font-family:var(--fm); font-size:13px; color:var(--ink); font-variant-numeric:tabular-nums}
+  .genbar .demospeed{font-family:var(--fm); font-size:10px; color:var(--ink-ghost); display:block; text-align:right; margin-top:2px}
+  .stages{margin:16px 0 0; display:flex; flex-direction:column}
+  .srow{display:grid; grid-template-columns:26px 1fr auto; gap:12px; align-items:flex-start; padding:12px 6px; border-bottom:1px solid var(--line); opacity:.42; transition:opacity .35s}
+  .srow:last-child{border-bottom:none}
+  .srow[data-st="active"],.srow[data-st="done"],.srow[data-st="warn"]{opacity:1}
+  .srow .ic{width:24px;height:24px;border-radius:50%;border:1.6px solid var(--ink-ghost);display:grid;place-items:center;flex:none;margin-top:1px}
+  .srow .ic svg{width:13px;height:13px;opacity:0}
+  .srow[data-st="active"] .ic{border-color:var(--ink);border-style:solid;position:relative}
+  .srow[data-st="active"] .ic::after{content:"";position:absolute;inset:3px;border:2px solid var(--line);border-top-color:var(--ink);border-radius:50%;animation:spin .7s linear infinite}
+  .srow[data-st="done"] .ic{background:var(--ink);border-color:var(--ink)}
+  .srow[data-st="done"] .ic svg{opacity:1;color:var(--ground)}
+  .srow[data-st="warn"] .ic{border-color:var(--ink);border-style:dashed}
+  .srow[data-st="warn"] .ic svg{opacity:1;color:var(--ink)}
+  .srow .lbl{font-weight:600}
+  .srow .desc{font-family:var(--fm); font-size:12px; color:var(--ink-faint); margin-top:3px; min-height:15px}
+  .srow[data-st="warn"] .desc{color:var(--ink)}
+  .srow .sub{margin-top:8px; display:flex; flex-direction:column; gap:5px}
+  .srow .subi{font-family:var(--fm); font-size:12px; color:var(--ink-faint); display:flex; align-items:center; gap:8px; opacity:.4; transition:opacity .3s}
+  .srow .subi[data-on="1"]{opacity:1; color:var(--ink-soft)}
+  .srow .subi .b{width:11px;height:11px;border:1.4px solid var(--ink);border-radius:3px;display:grid;place-items:center;flex:none}
+  .srow .subi[data-on="1"] .b{background:var(--ink)}
+  .srow .subi[data-on="1"] .b::after{content:"";width:5px;height:5px;background:var(--ground);border-radius:1px}
+  .srow .rt{align-self:center}
+  .btn{font-family:var(--fs); font-size:13px; font-weight:600; padding:8px 14px; border-radius:9px; border:1px solid var(--line-strong); background:var(--surface); color:var(--ink); transition:.15s; white-space:nowrap}
+  .btn:hover{background:var(--surface-2)}
+  .btn.primary{background:var(--ink); color:var(--ground); border-color:var(--ink)}
+  .btn.primary:hover{opacity:.88; background:var(--ink)}
+  .btn.sm{font-size:12px; padding:6px 11px}
+  .btn:disabled{opacity:.4; cursor:default}
+  .btnrow{display:flex; gap:10px; flex-wrap:wrap; margin-top:22px}
+  .gen-done{margin-top:20px; border:1px solid var(--line-strong); border-radius:12px; padding:16px 18px; display:flex; align-items:center; gap:14px; opacity:0; transform:translateY(8px); transition:.4s}
+  .gen-done[data-on="1"]{opacity:1; transform:none}
+  .gen-done .tick{width:30px;height:30px;border-radius:50%;background:var(--ink);color:var(--ground);display:grid;place-items:center;flex:none}
+  .gen-done h4{margin:0;font-size:15px}
+  .gen-done p{margin:2px 0 0;font-family:var(--fm);font-size:12px;color:var(--ink-faint)}
+
+  /* ---------- app preview (device) ---------- */
+  .device{max-width:760px; margin:14px auto 0; border:1px solid var(--line-strong); border-radius:14px; overflow:hidden; background:var(--surface); box-shadow:var(--shadow)}
+  .dev-top{display:flex; align-items:center; gap:8px; padding:9px 12px; border-bottom:1px solid var(--line); background:var(--surface-2)}
+  .dev-top .dots{display:flex; gap:5px}
+  .dev-top .dots i{width:9px;height:9px;border-radius:50%;border:1px solid var(--ink-ghost)}
+  .dev-top .durl{flex:1; text-align:center; font-family:var(--fm); font-size:11px; color:var(--ink-faint)}
+  .dev-top .live{font-size:10px;letter-spacing:.12em;background:var(--ink);color:var(--ground);padding:2px 7px;border-radius:999px;opacity:0;transition:.3s}
+  body[data-live="1"] .dev-top .live{opacity:1}
+  .app{padding:0}
+  .app-head{display:flex; align-items:center; gap:12px; padding:16px 18px; border-bottom:1px solid var(--line)}
+  .app-head .nm{font-weight:720; letter-spacing:-.01em}
+  .app-head .nm span{color:var(--ink-faint); font-weight:500}
+  .seg{margin-left:auto; display:flex; border:1px solid var(--line-strong); border-radius:9px; overflow:hidden; font-size:13px}
+  .seg button{padding:6px 14px; color:var(--ink-soft)}
+  .seg button[data-on="1"]{background:var(--ink); color:var(--ground)}
+  .app-body{padding:18px; display:grid; gap:16px; min-height:280px}
+  .view{display:none; gap:16px; grid-template-columns:1fr 1fr}
+  .view[data-on="1"]{display:grid; animation:rise .3s ease both}
+  @media (max-width:760px){ .view{grid-template-columns:1fr} }
+  .card{border:1px solid var(--line); border-radius:11px; padding:14px; background:var(--surface)}
+  .card h4{margin:0 0 12px; font-size:13px; font-family:var(--fm); letter-spacing:.04em; text-transform:uppercase; color:var(--ink-faint)}
+  .field{margin-bottom:10px}
+  .field label{display:block; font-size:12px; color:var(--ink-faint); margin-bottom:4px}
+  .field .inp{border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:13px; background:var(--surface-2); color:var(--ink)}
+  .field .inp.sel{display:flex; justify-content:space-between; align-items:center}
+  .row2{display:flex; gap:8px} .row2 .field{flex:1}
+  .lreq{display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--line)}
+  .lreq:last-child{border-bottom:none}
+  .lreq .who{font-weight:600; font-size:13px}
+  .lreq .meta{font-family:var(--fm); font-size:11px; color:var(--ink-faint)}
+  .lreq .days{margin-left:auto; font-family:var(--fm); font-size:12px}
+  .status{font-family:var(--fm); font-size:10px; letter-spacing:.06em; padding:3px 8px; border-radius:999px; border:1px solid var(--line-strong); text-transform:uppercase}
+  .status.pend{color:var(--ink-soft)}
+  .status.appr{background:var(--ink); color:var(--ground); border-color:var(--ink)}
+  .status.rej{border-style:dashed; color:var(--ink-faint)}
+  .qitem{padding:12px 0; border-bottom:1px solid var(--line)}
+  .qitem:last-child{border-bottom:none}
+  .qitem .top{display:flex; align-items:center; gap:10px}
+  .qitem .acts{display:flex; gap:8px; margin-top:10px}
+  .badge2{display:none; font-family:var(--fm); font-size:10px; letter-spacing:.04em; border:1px dashed var(--ink); border-radius:999px; padding:2px 8px; margin-left:6px; color:var(--ink)}
+  body[data-v="2"] .badge2.on{display:inline-block}
+  .balance{font-family:var(--fm); font-size:12px; color:var(--ink-faint); margin-top:6px}
+  .balance b{color:var(--ink); font-size:16px; font-family:var(--fs)}
+  .empty{color:var(--ink-faint); font-family:var(--fm); font-size:12px; text-align:center; padding:22px 0}
+
+  /* connect banner (partial failure) */
+  .banner{display:flex; align-items:center; gap:12px; margin:0 18px 16px; padding:11px 14px; border:1px dashed var(--ink); border-radius:10px; font-size:13px; background:var(--surface-2)}
+  .banner .i{width:20px;height:20px;border:1.5px solid var(--ink);border-radius:50%;display:grid;place-items:center;font-family:var(--fm);font-weight:700;flex:none}
+  .banner.gone{display:none}
+  .banner .btn{margin-left:auto}
+
+  /* approval sheet */
+  .scrim{position:absolute; inset:0; background:rgba(0,0,0,.34); opacity:0; pointer-events:none; transition:.3s; z-index:40; backdrop-filter:blur(1px)}
+  .scrim[data-on="1"]{opacity:1; pointer-events:auto}
+  .sheet{position:absolute; right:0; top:0; bottom:0; width:min(460px,92%); background:var(--surface); border-left:1px solid var(--line-strong); transform:translateX(102%); transition:transform .38s cubic-bezier(.2,.7,.2,1); z-index:41; display:flex; flex-direction:column}
+  .sheet[data-on="1"]{transform:none}
+  .sheet-h{padding:20px 22px 14px; border-bottom:1px solid var(--line)}
+  .sheet-h .eyebrow{margin-bottom:6px}
+  .sheet-h h3{margin:0; font-size:18px; letter-spacing:-.01em}
+  .sheet-b{padding:18px 22px; overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:16px}
+  .sblock .st{font-family:var(--fm); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:8px}
+  .sblock p{margin:0; color:var(--ink-soft); font-size:14px}
+  .kv{display:flex; gap:10px; align-items:flex-start; padding:8px 0; border-bottom:1px solid var(--line); font-size:13px}
+  .kv:last-child{border-bottom:none}
+  .kv .kk{font-family:var(--fm); font-size:11px; color:var(--ink-faint); width:96px; flex:none; padding-top:2px}
+  .kv .vv{color:var(--ink)}
+  .kv .flag{font-family:var(--fm); font-size:10px; border:1px dashed var(--ink); border-radius:999px; padding:1px 7px; margin-left:6px}
+  .sheet-f{padding:16px 22px; border-top:1px solid var(--line); display:flex; gap:10px}
+  .sheet-f .btn{flex:1; justify-content:center; text-align:center}
+
+  /* change / diff + migration */
+  .change{max-width:640px; margin:16px auto 0}
+  .diff{border:1px solid var(--line-strong); border-radius:12px; overflow:hidden}
+  .diff .dh{font-family:var(--fm); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-faint); padding:11px 15px; border-bottom:1px solid var(--line); background:var(--surface-2)}
+  .diff .dl{display:flex; gap:12px; padding:12px 15px; border-bottom:1px solid var(--line); font-size:14px}
+  .diff .dl:last-child{border-bottom:none}
+  .diff .dl .s{font-family:var(--fm); font-weight:700; width:16px; flex:none; text-align:center}
+  .diff .dl.add .s{color:var(--ink)} .diff .dl.same{color:var(--ink-soft)} .diff .dl.same .s{color:var(--ink-ghost)}
+  .diff .dl b{color:var(--ink)}
+  .mig{margin-top:20px; border:1px solid var(--line); border-radius:12px; padding:16px 18px; opacity:0; transform:translateY(8px); transition:.4s}
+  .mig[data-on="1"]{opacity:1; transform:none}
+  .mig .mt{display:flex; align-items:center; gap:10px; font-weight:640; margin-bottom:4px}
+  .mig .mt .z{font-family:var(--fm); font-size:11px; color:var(--ink-faint); margin-left:auto; border:1px solid var(--line); border-radius:999px; padding:3px 9px}
+  .mig .track{display:flex; gap:6px; margin:14px 0 10px}
+  .mig .track .seg{flex:1; height:6px; border-radius:3px; background:var(--surface-3); overflow:hidden; position:relative}
+  .mig .track .seg::after{content:"";position:absolute;inset:0;background:var(--ink);transform:scaleX(0);transform-origin:left;transition:transform .5s ease}
+  .mig .track .seg[data-on="1"]::after{transform:scaleX(1)}
+  .mig .steps{display:flex; justify-content:space-between; font-family:var(--fm); font-size:11px; color:var(--ink-faint); gap:4px}
+  .mig .steps span{flex:1; text-align:center; transition:color .3s}
+  .mig .steps span[data-on="1"]{color:var(--ink)}
+  .mig .msg{font-family:var(--fm); font-size:12px; color:var(--ink-faint); margin-top:10px; min-height:16px}
+
+  /* catalog */
+  .grid{max-width:820px; margin:16px auto 0; display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
+  @media (max-width:820px){ .grid{grid-template-columns:1fr 1fr} }
+  @media (max-width:560px){ .grid{grid-template-columns:1fr} }
+  .appcard{border:1px solid var(--line); border-radius:13px; padding:16px; background:var(--surface); transition:.18s; cursor:pointer; position:relative}
+  .appcard:hover{border-color:var(--line-strong); transform:translateY(-2px)}
+  .appcard .ico{width:34px;height:34px;border:1.6px solid var(--ink);border-radius:9px;display:grid;place-items:center;margin-bottom:12px}
+  .appcard .ico::after{content:"";width:12px;height:12px;background:var(--ink);border-radius:2px}
+  .appcard h4{margin:0 0 3px; font-size:15px}
+  .appcard p{margin:0; font-family:var(--fm); font-size:11px; color:var(--ink-faint)}
+  .appcard .tag{position:absolute; top:14px; right:14px; font-family:var(--fm); font-size:10px; letter-spacing:.08em; padding:3px 8px; border-radius:999px; border:1px solid var(--line-strong)}
+  .appcard .tag.live{background:var(--ink); color:var(--ground); border-color:var(--ink)}
+  .appcard.new{border-style:dashed; display:flex; flex-direction:column; align-items:flex-start; justify-content:center}
+  .appcard.new .ico{border-style:dashed} .appcard.new .ico::after{width:2px;height:14px;box-shadow:6px -6px 0 -6px,-6px 6px 0 -6px; background:var(--ink); position:relative}
+
+  /* skeleton */
+  .sk{background:linear-gradient(90deg,var(--surface-2) 25%,var(--surface-3) 37%,var(--surface-2) 63%); background-size:400% 100%; animation:sh 1.3s ease infinite; border-radius:6px}
+  @keyframes sh{to{background-position:-400% 0}}
+
+  /* toasts */
+  .toasts{position:fixed; bottom:20px; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; gap:8px; z-index:60; align-items:center; pointer-events:none}
+  .toast{background:var(--ink); color:var(--ground); font-size:13px; padding:10px 16px; border-radius:999px; box-shadow:var(--shadow); display:flex; align-items:center; gap:9px; animation:tin .3s ease both; font-family:var(--fs)}
+  .toast .tk{width:15px;height:15px;border:1.5px solid var(--ground);border-radius:50%;display:grid;place-items:center;flex:none}
+  .toast .tk svg{width:9px;height:9px}
+  @keyframes tin{from{opacity:0;transform:translateY(10px)}}
+
+  /* demo controls (in top bar) */
+  .topplay{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;padding:7px 13px;border-radius:8px;background:var(--ink);color:var(--ground);border:1px solid var(--ink);transition:.15s;white-space:nowrap}
+  .topplay:hover{opacity:.9}
+  .topplay.on{background:var(--surface);color:var(--ink);border-color:var(--line-strong)}
+  .topplay svg{width:12px;height:12px;flex:none}
+  .sep{width:1px;height:22px;background:var(--line);margin:0 3px}
+  @media (max-width:840px){ .topplay span.t{display:none} }
+
+  /* progress line under topbar */
+  .flow{position:absolute; left:0; right:0; bottom:-1px; height:2px; background:transparent}
+  .flow i{position:absolute; left:0; top:0; bottom:0; width:0; background:var(--ink); transition:width .5s ease}
+
+  @media (prefers-reduced-motion:reduce){ *{animation-duration:.001s!important; transition-duration:.05s!important} }
+  @media (max-width:840px){
+    .stage{grid-template-columns:1fr; grid-template-rows:44% 56%}
+    .chat{border-right:0; border-bottom:1px solid var(--line)}
+    .url{display:none}
+  }
+</style>
+</head>
+<body data-theme-default>
+  <!-- ================= TOP BAR ================= -->
+  <div class="top">
+    <div class="brand"><span class="mk"></span> Ziroo</div>
+    <div class="url"><div class="bar"><span class="lock"></span><span>app.ziroo/acme/<b id="urlSlug">…</b></span><span class="u-live">LIVE</span></div></div>
+    <div class="actions">
+      <button class="topplay" id="autoplay" title="Auto-play the full flow"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M8 5v14l11-7z"/></svg> Play demo</button>
+      <button class="iconbtn" id="restart" title="Restart demo" aria-label="Restart demo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button>
+      <span class="sep"></span>
+      <span class="pill" id="statusPill" data-tone="idle"><span class="d"></span><span id="statusText">Draft</span></span>
+      <button class="iconbtn" id="catalogBtn" title="Your apps" aria-label="Your apps"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></button>
+      <button class="iconbtn" id="themeBtn" title="Theme" aria-label="Theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg></button>
+    </div>
+    <div class="flow"><i id="flowline"></i></div>
+  </div>
+
+  <!-- ================= SHELL ================= -->
+  <div class="stage">
+    <!-- CHAT -->
+    <div class="chat">
+      <div class="chat-head">
+        <div class="cav"></div>
+        <div class="who">
+          <b>Ziroo</b>
+          <div class="st online" id="chatStatus"><span class="dot"></span><span id="chatStatusText">AI colleague · online</span></div>
+        </div>
+        <span class="mini">Chat</span>
+      </div>
+      <div class="msgs" id="msgs"></div>
+      <div class="composer">
+        <div class="chips" id="chips"></div>
+        <div class="inputrow">
+          <textarea id="input" rows="1" placeholder="Describe an internal tool…"></textarea>
+          <button class="send" id="send" aria-label="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>
+        </div>
+        <div class="hintrow"><span class="kbd">↵</span> to send<span class="sp"></span>Ziroo builds real, working apps</div>
+      </div>
+    </div>
+
+    <!-- CANVAS -->
+    <div class="canvas" id="canvas">
+      <!-- welcome -->
+      <div class="panel" data-panel="welcome" data-active="1">
+        <div class="welcome">
+          <div class="orbit"><div class="ring r2"><span class="sat"></span></div><div class="ring r1"></div><div class="core"></div></div>
+          <div class="big">Describe an internal tool. Ziroo builds it.</div>
+          <div class="lede">No canvas, no drag-and-drop. Say what you need in plain language and a real, working app ships at a URL your team can use.</div>
+          <div class="steps"><span>Describe</span><span>Ziroo builds</span><span>You approve</span><span>Goes live</span></div>
+        </div>
+      </div>
+
+      <!-- generation -->
+      <div class="panel" data-panel="gen">
+        <div class="panel-head"><span class="eyebrow">Building · this usually takes a few minutes</span></div>
+        <h2 id="genTitle">Building your leave tracker</h2>
+        <div class="genwrap">
+          <div class="genbar">
+            <div class="spin" id="genSpin"></div>
+            <div><div class="gt" id="genStageName">Understanding your request</div><div class="gsub" id="genStageSub">reading what you asked for</div></div>
+            <div style="margin-left:auto;text-align:right"><div class="timer" id="genTimer">0:00</div><span class="demospeed">demo speed · real ≈ minutes</span></div>
+          </div>
+          <div class="stages" id="stages"></div>
+          <div class="gen-done" id="genDone">
+            <div class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 6"/></svg></div>
+            <div style="flex:1"><h4 id="genDoneTitle">Your app is ready</h4><p id="genDoneSub">1 thing needs your attention before it can email approvals</p></div>
+            <button class="btn primary" id="toPreview">Review it</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- app preview / live -->
+      <div class="panel" data-panel="app">
+        <div class="panel-head"><span class="eyebrow" id="appEyebrow">Preview · running on sample data</span></div>
+        <h2 id="appTitle">Your leave tracker — review before it goes live</h2>
+        <div class="device">
+          <div class="dev-top"><div class="dots"><i></i><i></i><i></i></div><div class="durl">app.ziroo/acme/leave-tracker</div><span class="live">LIVE</span></div>
+          <div class="banner" id="connBanner">
+            <span class="i">!</span>
+            <span><b>Gmail isn’t connected.</b> Everything else is built — approvals just can’t email yet.</span>
+            <button class="btn sm" id="reconnect">Reconnect</button>
+          </div>
+          <div class="app">
+            <div class="app-head">
+              <div class="nm">Acme <span>·</span> Leave Tracker</div>
+              <div class="seg" id="roleSeg">
+                <button data-role="emp" data-on="1">Employee</button>
+                <button data-role="mgr">Manager</button>
+              </div>
+            </div>
+            <div class="app-body">
+              <!-- employee -->
+              <div class="view" data-view="emp" data-on="1">
+                <div class="card">
+                  <h4>Request leave</h4>
+                  <div class="field"><label>Type</label><div class="inp sel">Annual leave <span class="mono" style="color:var(--ink-faint)">▾</span></div></div>
+                  <div class="row2"><div class="field"><label>From</label><div class="inp mono" id="fFrom">12 Aug</div></div><div class="field"><label>To</label><div class="inp mono" id="fTo">18 Aug</div></div></div>
+                  <div class="field"><label>Reason</label><div class="inp">Family holiday</div></div>
+                  <button class="btn primary sm" id="submitLeave" style="width:100%;justify-content:center">Submit request</button>
+                  <div class="balance">Balance <b id="balEmp">12</b> days</div>
+                </div>
+                <div class="card">
+                  <h4>My requests</h4>
+                  <div id="myReqs">
+                    <div class="lreq"><div><div class="who">Annual leave</div><div class="meta">12–18 Aug</div></div><div class="days">6d</div><span class="status pend">Pending</span></div>
+                    <div class="lreq"><div><div class="who">Sick leave</div><div class="meta">2 Aug</div></div><div class="days">1d</div><span class="status appr">Approved</span></div>
+                  </div>
+                </div>
+              </div>
+              <!-- manager -->
+              <div class="view" data-view="mgr">
+                <div class="card" style="grid-column:1 / -1">
+                  <h4>Approval queue <span id="queueCount" class="mono" style="color:var(--ink-faint);text-transform:none;letter-spacing:0"></span></h4>
+                  <div id="queue">
+                    <div class="qitem" data-id="q1" data-days="6">
+                      <div class="top"><div><div class="who">Priya S. · Annual leave</div><div class="meta">12–18 Aug · 6 days</div></div><div class="days" style="margin-left:auto"><span class="status pend">Pending</span></div></div>
+                      <div class="mono" style="font-size:11px;color:var(--ink-faint);margin-top:6px">Balance after: 11 days <span class="badge2 on">· needs Dept Head too (&gt;5 days)</span></div>
+                      <div class="acts"><button class="btn sm rej" data-act="rej">Reject</button><button class="btn sm primary" data-act="appr">Approve</button></div>
+                    </div>
+                    <div class="qitem" data-id="q2" data-days="2">
+                      <div class="top"><div><div class="who">Diego M. · Sick leave</div><div class="meta">21–22 Aug · 2 days</div></div><div class="days" style="margin-left:auto"><span class="status pend">Pending</span></div></div>
+                      <div class="mono" style="font-size:11px;color:var(--ink-faint);margin-top:6px">Balance after: 8 days</div>
+                      <div class="acts"><button class="btn sm rej" data-act="rej">Reject</button><button class="btn sm primary" data-act="appr">Approve</button></div>
+                    </div>
+                  </div>
+                  <div class="empty" id="queueEmpty" style="display:none">All caught up — no requests waiting.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="btnrow" id="previewCtas">
+          <button class="btn primary" id="openApprove">Approve &amp; publish</button>
+          <button class="btn" id="tweak">Ask for a change</button>
+        </div>
+      </div>
+
+      <!-- change (diff + migration) -->
+      <div class="panel" data-panel="change">
+        <div class="panel-head"><span class="eyebrow">Proposed change · nothing applied yet</span></div>
+        <h2>Here’s what will change</h2>
+        <p class="sub">Plain-English, not code. Review the effect, then apply. Your live data and anyone mid-flow stay safe.</p>
+        <div class="change">
+          <div class="diff">
+            <div class="dh">Change to “Leave Tracker” · v1 → v2</div>
+            <div class="dl add"><span class="s">+</span><span>Adds a <b>second approval step (Dept Head)</b> for any request longer than <b>5 days</b>.</span></div>
+            <div class="dl same"><span class="s">~</span><span>Requests of 5 days or fewer are unchanged — still one approval.</span></div>
+            <div class="dl same"><span class="s">~</span><span><b>Existing pending requests are unaffected</b> and keep their current flow.</span></div>
+          </div>
+          <div class="mig" id="mig">
+            <div class="mt"><div class="spin" style="width:16px;height:16px" id="migSpin"></div><span id="migTitle">Applying safely…</span><span class="z">zero downtime</span></div>
+            <div class="track" id="migTrack"><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div></div>
+            <div class="steps"><span>Expand</span><span>Backfill</span><span>Dual-write</span><span>Cutover</span><span>Contract</span></div>
+            <div class="msg" id="migMsg">Both old and new versions run side by side — no one using the app is interrupted.</div>
+          </div>
+          <div class="btnrow" id="changeCtas">
+            <button class="btn primary" id="applyChange">Apply change</button>
+            <button class="btn" id="discardChange">Not now</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- catalog -->
+      <div class="panel" data-panel="catalog">
+        <div class="panel-head"><span class="eyebrow">Your apps · one account</span></div>
+        <h2>Fifty apps could live here — they’d all feel like one product</h2>
+        <p class="sub">Every app Ziroo builds shares one design language and one set of rules. Nothing to theme, nothing drifts.</p>
+        <div class="grid">
+          <div class="appcard" id="openLeave"><span class="tag live">LIVE</span><div class="ico"></div><h4>Leave Tracker</h4><p>employees · managers · <span id="catVer">v1</span></p></div>
+          <div class="appcard"><span class="tag">DRAFT</span><div class="ico"></div><h4>Purchase Orders</h4><p>requesters · finance · v0</p></div>
+          <div class="appcard"><span class="tag">DRAFT</span><div class="ico"></div><h4>Asset Register</h4><p>it · everyone · v0</p></div>
+          <div class="appcard new" id="newApp"><div class="ico"></div><h4>Describe a new app</h4><p>start from a sentence</p></div>
+        </div>
+      </div>
+
+      <!-- approval sheet -->
+      <div class="scrim" id="scrim"></div>
+      <div class="sheet" id="sheet">
+        <div class="sheet-h"><div class="eyebrow">Approve to publish</div><h3>You’re approving what this app does</h3></div>
+        <div class="sheet-b">
+          <div class="sblock"><div class="st">In plain words</div><p>Employees submit leave requests. Their manager approves or rejects them. When a request is approved, the employee’s balance goes down automatically.</p></div>
+          <div class="sblock">
+            <div class="st">What it will touch</div>
+            <div class="kv"><span class="kk">Stores</span><span class="vv">Leave requests, approvals, and each person’s balance.</span></div>
+            <div class="kv"><span class="kk">Who sees what</span><span class="vv">Employees see only their own requests. Managers see their team’s queue.</span></div>
+            <div class="kv"><span class="kk">Connected tools</span><span class="vv">Gmail — send approval emails <span class="flag" id="gmailFlag">needs reconnect</span></span></div>
+          </div>
+          <div class="sblock"><div class="st">Try before you trust</div><p>The preview you just clicked through runs on realistic sample data — no real information was touched.</p></div>
+        </div>
+        <div class="sheet-f"><button class="btn" id="cancelApprove">Not yet</button><button class="btn primary" id="confirmApprove">Approve &amp; publish</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toasts" id="toasts"></div>
+
+<script>
+(function(){
+  "use strict";
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+  var $ = function(s,r){return (r||document).querySelector(s);};
+  var $$ = function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));};
+  var run = 0;                       // run token — bumping cancels in-flight sequences
+  var auto = false;
+  function sleep(ms){ return new Promise(function(res){ setTimeout(res, reduce?Math.min(ms,60):ms); }); }
+  function cancelled(id){ return id !== run; }
+
+  // ---------- primitives ----------
+  var msgs = $("#msgs");
+  var lastRole = null;
+  function scrollChat(){ msgs.scrollTop = msgs.scrollHeight; }
+  function nowTime(){ var t=new Date(), h=t.getHours(), m=t.getMinutes(); return (h%12||12)+":"+(m<10?"0":"")+m+" "+(h<12?"am":"pm"); }
+  function chatStatus(text, mode){ var st=$("#chatStatus"); if(!st) return; st.className="st "+(mode||"online"); $("#chatStatusText").textContent=text; }
+
+  // build a message shell; returns the .col to append content into (grouping hides repeated avatar/meta)
+  function makeMsg(role){
+    var m=document.createElement("div"); m.className="msg "+(role==="user"?"user":"ziroo");
+    if(lastRole===role) m.classList.add("grp");
+    var av=document.createElement("div"); av.className="av"; m.appendChild(av);
+    var col=document.createElement("div"); col.className="col";
+    var meta=document.createElement("div"); meta.className="meta";
+    meta.innerHTML='<b>'+(role==="user"?"You":"Ziroo")+'</b><span>'+nowTime()+'</span>';
+    col.appendChild(meta); m.appendChild(col);
+    msgs.appendChild(m); lastRole=role; scrollChat(); return col;
+  }
+  function addUser(text){
+    var col=makeMsg("user");
+    var b=document.createElement("div"); b.className="bub"; b.textContent=text; col.appendChild(b);
+    scrollChat(); return col;
+  }
+  function addZiroo(){
+    var col=makeMsg("ziroo");
+    var b=document.createElement("div"); b.className="bub"; col.appendChild(b);
+    scrollChat(); return b;
+  }
+  function zirooGreet(text){ var b=addZiroo(); b.textContent=text; scrollChat(); }
+
+  async function stream(el, text, id, opts){
+    opts=opts||{}; var cur=document.createElement("span"); cur.className="cursor"; el.textContent=""; el.appendChild(cur);
+    var acc="";
+    for (var i=0;i<text.length;i++){
+      if(cancelled(id)) return;
+      acc+=text[i]; el.textContent=acc; el.appendChild(cur); scrollChat();
+      await sleep(reduce?0:(text[i]===" "?12:22));
+    }
+    if(cancelled(id)) return;
+    el.removeChild(cur);
+    if(opts.note){ var n=document.createElement("div"); n.className="note"; n.textContent=opts.note; el.appendChild(n); scrollChat(); }
+  }
+  // Ziroo replies: brief "typing…" indicator, then streams the text
+  async function zirooSay(text, id, opts){
+    var b=addZiroo();
+    b.className="bub think"; b.innerHTML='<i></i><i></i><i></i>';
+    chatStatus("typing…","think");
+    await sleep(reduce?40:520); if(cancelled(id)) return b;
+    b.className="bub"; b.textContent="";
+    await stream(b, text, id, opts);
+    if(!cancelled(id)) chatStatus("AI colleague · online","online");
+    return b;
+  }
+
+  var toasts=$("#toasts");
+  function toast(text){
+    var t=document.createElement("div"); t.className="toast";
+    t.innerHTML='<span class="tk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 6"/></svg></span>'+text;
+    toasts.appendChild(t);
+    setTimeout(function(){ t.style.transition="opacity .3s,transform .3s"; t.style.opacity="0"; t.style.transform="translateY(8px)"; setTimeout(function(){t.remove();},320); }, 2600);
+  }
+
+  // ---------- scene / status ----------
+  function panel(name){ $$(".panel").forEach(function(p){ p.setAttribute("data-active", p.getAttribute("data-panel")===name?"1":"0"); }); }
+  var statusPill=$("#statusPill"), statusText=$("#statusText"), flow=$("#flowline");
+  var FLOW={welcome:6, gen:28, app:52, approve:64, live:74, change:86, live2:96, catalog:100};
+  function status(text, tone, flowPct){
+    statusText.textContent=text; statusPill.setAttribute("data-tone",tone||"idle");
+    if(flowPct!=null) flow.style.width=flowPct+"%";
+  }
+
+  // ---------- state ----------
+  var state={ role:"emp", published:false, version:1, gmail:false, q1:"pending", q2:"pending" };
+  function setRole(r){
+    state.role=r;
+    $$("#roleSeg button").forEach(function(b){ b.setAttribute("data-on", b.getAttribute("data-role")===r?"1":"0"); });
+    $$(".view").forEach(function(v){ v.setAttribute("data-on", v.getAttribute("data-view")===r?"1":"0"); });
+  }
+
+  // ---------- generation ----------
+  var STAGES=[
+    {id:"understand", label:"Understand the request", desc:"employee + manager roles, auto-decrement", ms:1300},
+    {id:"plan", label:"Plan the build", desc:"breaking it into pieces", ms:1100, sub:["Data model","Employee view","Manager approval queue","Roles & access","Email on approval"]},
+    {id:"data", label:"Build the data model", desc:"Requests · Approvals · Balances", ms:1200},
+    {id:"views", label:"Build the screens", desc:"employee form + manager queue", ms:1500, sub:["Employee — request form","Manager — approval queue"]},
+    {id:"roles", label:"Wire roles & access", desc:"an employee can’t see the manager’s view", ms:1100},
+    {id:"connect", label:"Connect Gmail", desc:"for approval emails", ms:1500, fail:true},
+    {id:"verify", label:"Verify", desc:"schema · access rules · smoke test", ms:1300}
+  ];
+  function buildStageRows(){
+    var host=$("#stages"); host.innerHTML="";
+    STAGES.forEach(function(s){
+      var row=document.createElement("div"); row.className="srow"; row.setAttribute("data-st","idle"); row.id="st-"+s.id;
+      var sub = s.sub ? '<div class="sub">'+s.sub.map(function(t){return '<div class="subi"><span class="b"></span>'+t+'</div>';}).join("")+'</div>' : '';
+      row.innerHTML='<div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 6"/></svg></div>'+
+        '<div><div class="lbl">'+s.label+'</div><div class="desc">'+s.desc+'</div>'+sub+'</div>'+
+        '<div class="rt"></div>';
+      host.appendChild(row);
+    });
+  }
+  function fmt(t){ var m=Math.floor(t/60), s=t%60; return m+":"+(s<10?"0":"")+s; }
+
+  async function generate(id){
+    status("Generating…","run",FLOW.gen); panel("gen"); chatStatus("building your app…","think");
+    $("#genTitle").textContent="Building your leave tracker";
+    $("#genDone").setAttribute("data-on","0"); $("#genSpin").style.display="";
+    buildStageRows();
+    // timer
+    var t=0; $("#genTimer").textContent="0:00";
+    var timer=setInterval(function(){ if(cancelled(id)){clearInterval(timer);return;} t++; $("#genTimer").textContent=fmt(t*7); },1000*(reduce?0.05:0.42));
+
+    for(var i=0;i<STAGES.length;i++){
+      if(cancelled(id)){clearInterval(timer);return;}
+      var s=STAGES[i], row=$("#st-"+s.id);
+      row.setAttribute("data-st","active");
+      $("#genStageName").textContent=s.label; $("#genStageSub").textContent=s.desc;
+      // narrate a couple of key stages in chat
+      if(s.id==="understand"){ /* narration already sent before generate */ }
+      // sub-items tick progressively
+      if(s.sub){
+        var subs=$$(".subi",row);
+        for(var j=0;j<subs.length;j++){ await sleep(s.ms/(subs.length+1)); if(cancelled(id)){clearInterval(timer);return;} subs[j].setAttribute("data-on","1"); }
+      }
+      await sleep(s.ms);
+      if(cancelled(id)){clearInterval(timer);return;}
+      if(s.fail){
+        row.setAttribute("data-st","warn");
+        row.querySelector(".ic svg").innerHTML='<path d="M12 8v5M12 16.5v.01"/>';
+        row.querySelector(".desc").textContent="Couldn’t connect — the Gmail login expired. You can reconnect after.";
+        var rt=row.querySelector(".rt"); rt.innerHTML='<span class="mono" style="font-size:11px;color:var(--ink)">needs attention</span>';
+      } else {
+        row.setAttribute("data-st","done");
+      }
+    }
+    clearInterval(timer);
+    if(cancelled(id))return;
+    $("#genSpin").style.display="none";
+    $("#genStageName").textContent="Done — with one thing to fix";
+    $("#genStageSub").textContent="the app is built and ready to preview";
+    $("#genDone").setAttribute("data-on","1");
+    status("Ready","idle",FLOW.gen+6); chatStatus("AI colleague · online","online");
+  }
+
+  // ---------- flows ----------
+  var chips=$("#chips"), input=$("#input"), send=$("#send");
+  function setChips(list){
+    chips.innerHTML="";
+    (list||[]).forEach(function(c){
+      var b=document.createElement("button"); b.className="chip"; b.title=c.k||"";
+      b.innerHTML='<span class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 17 17 7M8 7h9v9"/></svg></span><span>'+c.t+'</span>';
+      b.onclick=function(){ c.fn(); }; chips.appendChild(b);
+    });
+  }
+  function lockComposer(ph){ input.value=""; input.placeholder=ph||"…"; }
+
+  async function startBuild(id){
+    setChips([]);
+    addUser("I need a leave tracker. Employees submit requests, managers approve or reject, and balances decrement automatically.");
+    await sleep(500); if(cancelled(id))return;
+    await zirooSay("Got it — a leave tracker with an employee view, a manager approval queue, role-based access, and balances that update on approval. Building it now. This usually takes a few minutes.", id);
+    if(cancelled(id))return;
+    await generate(id); if(cancelled(id))return;
+    await sleep(300);
+    await zirooSay("Your leave tracker is built and running on sample data. I couldn’t connect Gmail (the login expired) — everything else works. Review it, then approve to go live.", id);
+    setChips([]);
+    lockComposer("Ask for a change, or approve to publish…");
+  }
+
+  function goPreview(){
+    panel("app"); status("Preview","idle",FLOW.app);
+    $("#appEyebrow").textContent="Preview · running on sample data";
+    $("#appTitle").textContent="Your leave tracker — review before it goes live";
+    $("#previewCtas").style.display="flex";
+    setRole("emp");
+  }
+
+  function openApprove(){ $("#scrim").setAttribute("data-on","1"); $("#sheet").setAttribute("data-on","1"); status("Approving","run",FLOW.approve); }
+  function closeApprove(){ $("#scrim").setAttribute("data-on","0"); $("#sheet").setAttribute("data-on","0"); }
+
+  async function publish(id){
+    closeApprove();
+    status("Publishing…","run",FLOW.approve+4);
+    await zirooSay("Publishing… wiring the app to its data and putting it behind role-based access.", id, {}); if(cancelled(id))return;
+    await sleep(900); if(cancelled(id))return;
+    state.published=true; document.body.setAttribute("data-live","1");
+    $("#appEyebrow").textContent="Live · your team can use it now";
+    $("#appTitle").textContent="Leave Tracker — live at app.ziroo/acme/leave-tracker";
+    status("Live","live",FLOW.live);
+    toast("Published — Leave Tracker is live");
+    await zirooSay("Done. It’s live at app.ziroo/acme/leave-tracker and your team can use it now. Want to change anything? Just tell me.", id);
+    setChips([{k:"edit",t:"Add a second approval step for anything longer than 5 days", fn:function(){ proposeChange(++run); }}]);
+    lockComposer("Tell me what to change…");
+  }
+
+  async function proposeChange(id){
+    setChips([]);
+    addUser("Add a second approval step for anything longer than five days.");
+    await sleep(450); if(cancelled(id))return;
+    await zirooSay("Sure. Here’s exactly what will change — in plain words, not code. Nothing is applied until you approve it, and anyone mid-flow stays safe.", id); if(cancelled(id))return;
+    panel("change"); status("Reviewing change","run",FLOW.change);
+    $("#mig").setAttribute("data-on","0");
+    $$("#migTrack .seg").forEach(function(s){s.setAttribute("data-on","0");});
+    $$(".mig .steps span").forEach(function(s){s.setAttribute("data-on","0");});
+    $("#changeCtas").style.display="flex";
+    $("#migMsg").textContent="Both old and new versions run side by side — no one using the app is interrupted.";
+  }
+
+  async function applyChange(id){
+    $("#changeCtas").style.display="none";
+    $("#mig").setAttribute("data-on","1");
+    var steps=["Expand — add the new step alongside the old flow","Backfill — bring existing data up to date","Dual-write — old and new run together","Cutover — switch reads to the new flow","Contract — remove the old path"];
+    var segs=$$("#migTrack .seg"), names=$$(".mig .steps span");
+    for(var i=0;i<segs.length;i++){
+      if(cancelled(id))return;
+      segs[i].setAttribute("data-on","1"); names[i].setAttribute("data-on","1");
+      $("#migMsg").textContent=steps[i];
+      await sleep(760);
+    }
+    if(cancelled(id))return;
+    $("#migSpin").style.display="none"; $("#migTitle").textContent="Applied — live, with zero downtime";
+    state.version=2; document.body.setAttribute("data-v","2"); $("#catVer").textContent="v2";
+    toast("Updated — now v2, no downtime");
+    await sleep(500);
+    await zirooSay("Applied. Requests longer than five days now need a second approval from the Dept Head. Existing pending requests were left untouched. You can roll back to v1 anytime.", id);
+    // back to live app, manager view to show the new 2-step badge
+    panel("app"); status("Live · v2","live",FLOW.live2);
+    $("#appTitle").textContent="Leave Tracker — live · v2";
+    setRole("mgr");
+    setChips([{k:"apps",t:"See all my apps", fn:function(){ openCatalog(); }}]);
+    lockComposer("Describe another tool, or ask for a change…");
+  }
+
+  function openCatalog(){ panel("catalog"); status(state.published?"Live":"Draft", state.published?"live":"idle", FLOW.catalog); }
+
+  // ---------- interactions ----------
+  function submitLeave(){
+    var host=$("#myReqs");
+    var row=document.createElement("div"); row.className="lreq"; row.style.opacity="0";
+    row.innerHTML='<div><div class="who">Annual leave</div><div class="meta">12–18 Aug</div></div><div class="days">6d</div><span class="status pend">Pending</span>';
+    host.insertBefore(row, host.firstChild);
+    requestAnimationFrame(function(){ row.style.transition="opacity .3s,transform .3s"; row.style.opacity="1"; });
+    toast("Request submitted");
+  }
+  function decide(item, ok){
+    var pill=item.querySelector(".status");
+    var acts=item.querySelector(".acts");
+    pill.className="status "+(ok?"appr":"rej"); pill.textContent=ok?"Approved":"Rejected";
+    if(acts) acts.remove();
+    if(ok){ var bal=$("#balEmp"); if(bal){ bal.textContent=String(Math.max(0, parseInt(bal.textContent,10)-parseInt(item.getAttribute("data-days")||"0",10))); } }
+    item.style.transition="opacity .4s"; item.style.opacity=".5";
+    // empty state
+    var remaining=$$("#queue .qitem .status.pend").length;
+    $("#queueCount").textContent = remaining? "· "+remaining+" waiting" : "";
+    if(remaining===0){ $("#queueEmpty").style.display="block"; }
+    toast(ok?"Approved — employee notified":"Request rejected");
+  }
+  async function reconnect(id){
+    var btn=$("#reconnect"); btn.disabled=true; btn.textContent="Connecting…";
+    await sleep(1100); if(cancelled(id)){return;}
+    state.gmail=true; $("#connBanner").classList.add("gone");
+    var flag=$("#gmailFlag"); if(flag){ flag.textContent="connected"; flag.style.borderStyle="solid"; }
+    toast("Gmail connected — approvals can email now");
+  }
+
+  // ---------- reset ----------
+  function reset(){
+    run++; auto=false; $("#autoplay").classList.remove("on"); $("#autoplay").innerHTML='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Play';
+    state={ role:"emp", published:false, version:1, gmail:false };
+    document.body.removeAttribute("data-live"); document.body.removeAttribute("data-v");
+    msgs.innerHTML=""; lastRole=null; $("#catVer").textContent="v1"; $("#urlSlug").textContent="…";
+    $("#connBanner").classList.remove("gone");
+    var flag=$("#gmailFlag"); if(flag){ flag.textContent="needs reconnect"; flag.style.borderStyle="dashed"; }
+    $("#genSpin").style.display=""; $("#migSpin").style.display=""; $("#migTitle").textContent="Applying safely…";
+    // reset queue
+    $("#queueEmpty").style.display="none"; $("#queueCount").textContent="";
+    $$("#queue .qitem").forEach(function(it){
+      it.style.opacity="1";
+      var pill=it.querySelector(".status"); pill.className="status pend"; pill.textContent="Pending";
+      if(!it.querySelector(".acts")){ var d=document.createElement("div"); d.className="acts"; d.innerHTML='<button class="btn sm rej" data-act="rej">Reject</button><button class="btn sm primary" data-act="appr">Approve</button>'; it.appendChild(d); }
+    });
+    $("#balEmp").textContent="12";
+    closeApprove(); panel("welcome"); status("Draft","idle",FLOW.welcome); setRole("emp");
+    var slug=$("#urlSlug"); slug.textContent="…";
+    chatStatus("AI colleague · online","online");
+    zirooGreet("Hey — I’m Ziroo. Tell me what internal tool your team needs, in plain words, and I’ll build it, wire the data, and ship it at a URL your team can use. Try the suggestion below.");
+    setChips([{k:"try",t:"I need a leave tracker", fn:function(){ kickoff(); }}]);
+    lockComposer("Describe an internal tool…");
+    input.focus();
+  }
+
+  var CURRENT=0;
+  async function kickoff(){ CURRENT=++run; $("#urlSlug").textContent="leave-tracker"; await startBuild(CURRENT); }
+
+  // ---------- autoplay ----------
+  async function autoplayRun(){
+    reset(); await sleep(400);
+    var id=++run; CURRENT=id; auto=true;
+    $("#autoplay").classList.add("on"); $("#autoplay").innerHTML='<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg> Playing';
+    $("#urlSlug").textContent="leave-tracker";
+    await startBuild(id); if(cancelled(id))return;         // type → generate → ready
+    await sleep(900); goPreview(); if(cancelled(id))return;
+    await sleep(1400); setRole("mgr"); await sleep(1300); decide($('[data-id="q2"]'),true); if(cancelled(id))return;
+    await sleep(1200); setRole("emp"); await sleep(900);
+    await sleep(700); openApprove(); if(cancelled(id))return;
+    await sleep(1900); await publish(id); if(cancelled(id))return;
+    await sleep(2200); await proposeChange(id); if(cancelled(id))return;
+    await sleep(2200); await applyChange(id); if(cancelled(id))return;
+    await sleep(2400); openCatalog();
+    $("#autoplay").classList.remove("on"); $("#autoplay").innerHTML='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Replay';
+    auto=false;
+  }
+
+  // ---------- wire events ----------
+  function sendFromInput(){
+    var v=input.value.trim();
+    // In this prototype the primary path is guided; any send kicks off the build (or is ignored mid-flow).
+    if(!state.published){ kickoff(); } else { proposeChange(++run); }
+  }
+  send.addEventListener("click", sendFromInput);
+  input.addEventListener("keydown", function(e){ if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); sendFromInput(); } });
+  input.addEventListener("input", function(){ input.style.height="auto"; input.style.height=Math.min(input.scrollHeight,96)+"px"; });
+
+  $("#toPreview").addEventListener("click", goPreview);
+  $("#roleSeg").addEventListener("click", function(e){ var b=e.target.closest("button"); if(b) setRole(b.getAttribute("data-role")); });
+  $("#submitLeave").addEventListener("click", submitLeave);
+  $("#queue").addEventListener("click", function(e){ var b=e.target.closest("button[data-act]"); if(!b)return; var item=b.closest(".qitem"); decide(item, b.getAttribute("data-act")==="appr"); });
+  $("#reconnect").addEventListener("click", function(){ reconnect(run); });
+  $("#openApprove").addEventListener("click", openApprove);
+  $("#confirmApprove").addEventListener("click", function(){ publish(++run); });
+  $("#cancelApprove").addEventListener("click", function(){ closeApprove(); status("Preview","idle",FLOW.app); });
+  $("#scrim").addEventListener("click", function(){ closeApprove(); status("Preview","idle",FLOW.app); });
+  $("#tweak").addEventListener("click", function(){ if(state.published){ proposeChange(++run);} else { toast("Approve & publish first, then you can change it live"); } });
+  $("#applyChange").addEventListener("click", function(){ applyChange(run); });
+  $("#discardChange").addEventListener("click", function(){ panel("app"); status(state.published?"Live":"Preview", state.published?"live":"idle", FLOW.app); });
+  $("#catalogBtn").addEventListener("click", openCatalog);
+  $("#openLeave").addEventListener("click", function(){ panel("app"); status(state.published?"Live":"Preview", state.published?"live":"idle", state.published?FLOW.live2:FLOW.app); });
+  $("#newApp").addEventListener("click", reset);
+  $("#restart").addEventListener("click", reset);
+  $("#autoplay").addEventListener("click", function(){ if(auto){ reset(); } else { autoplayRun(); } });
+
+  // theme toggle
+  $("#themeBtn").addEventListener("click", function(){
+    var cur=document.documentElement.getAttribute("data-theme");
+    var next = cur==="dark"?"light":(cur==="light"?"dark":( (window.matchMedia && window.matchMedia("(prefers-color-scheme:dark)").matches)?"light":"dark"));
+    document.documentElement.setAttribute("data-theme", next);
+  });
+
+  // ---------- go ----------
+  reset();
+})();
+</script>
+</body>
+</html>
